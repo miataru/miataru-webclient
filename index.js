@@ -13,7 +13,7 @@ var map = L.map('map').setView([49.81877,10.80651], 13);
 
 		var popup = L.popup();
 
-		function onMapClick(e) {
+		/*function onMapClick(e) {
 			popup
 				.setLatLng(e.latlng)
 				.setContent("You clicked the map at " + e.latlng.toString())
@@ -21,5 +21,16 @@ var map = L.map('map').setView([49.81877,10.80651], 13);
 		}
 
 		map.on('click', onMapClick);
+		*/
+		
+// add location control to global name space for testing only
+// on a production site, omit the "lc = "!
+L.control.locate({follow: false}).addTo(map);
 
+//map.on('startfollowing', function() {
+//    map.on('dragstart', lc.stopFollowing);
+//}).on('stopfollowing', function() {
+//    map.off('dragstart', lc.stopFollowing);
+//});
+		
 }
