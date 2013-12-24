@@ -110,7 +110,11 @@
       </div>
       <div class="modal-body">
       <span>
-      This is a website client for the Miataru service. You can interact with the server side through this website. To save known devices and quickly access them later your browser needs to support HTML5 Web Storage (Web storage is supported in Internet Explorer 8+, Firefox, Opera, Chrome, and Safari.)
+      This is a website client for the Miataru service. You can interact with the server side through this website. <p>
+      To save known devices and quickly access them later your browser needs to support HTML5 Web Storage (Web storage is supported in Internet Explorer 8+, Firefox, Opera, Chrome, and Safari.)<p>
+      Get more information here: <a href="http://miataru.com">miataru.com</a><p>
+      Get the sourcecode here: <a href="http://github.com/miataru">github</a><p>
+      (C) Daniel Kirstenpfad / <a href="http://www.technology-ninja.com">technology-ninja</a>
       </span>
       </div>
       <div class="modal-footer">
@@ -131,5 +135,23 @@ document.getElementById('DeviceIDSearchButton').onclick = function()
 // fill the drop-down with already saved HTML5 local storage known devices...
 
 </script>
+
+<!-- Piwik Tracking Code -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(["setCookieDomain", "*.miataru.com"]);
+  _paq.push(["trackPageView"]);
+  _paq.push(["enableLinkTracking"]);
+
+  (function() {
+    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://schrankmonster.de/piwik/";
+    _paq.push(["setTrackerUrl", u+"piwik.php"]);
+    _paq.push(["setSiteId", "13"]);
+    var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
+    g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- Piwik Tracking Code -->
+
   </body>
 </html>
