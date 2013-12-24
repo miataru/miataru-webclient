@@ -11,6 +11,7 @@ html, body, #map {
 {
       position: relative;
       z-index: 100;
+      opacity: 0.9;
 }
 
 .btnStyle {
@@ -37,4 +38,12 @@ html, body, #map {
         padding-right-rtl-source: physical;
     font-size: 18px;
     line-height: 20px;
+}
+
+.navbar-form {
+	width: 335px;
+}
+
+.input-group .form-control{
+	width: 335px;
 }

@@ -42,27 +42,14 @@
 		            <!-- Collect the nav links, forms, and other content for toggling -->
 		            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 		               <ul class="nav navbar-nav">
-		                  <li><a href="#about" data-toggle="modal" data-target="#about">About</a></li>
-		                  
-		                  <!--<li class="dropdown">
-		                     <a href="http://www.jquery2dotnet.com" class="dropdown-toggle" data-toggle="dropdown">Pages <b class="caret"></b></a>
-		                     <ul class="dropdown-menu">
-		                        <li><a href="http://www.jquery2dotnet.com">Action</a></li>
-		                        <li><a href="http://www.jquery2dotnet.com">Another action</a></li>
-		                        <li><a href="http://www.jquery2dotnet.com">Something else here</a></li>
-		                        <li class="divider"></li>
-		                        <li><a href="http://www.jquery2dotnet.com">Separated link</a></li>
-		                        <li class="divider"></li>
-		                        <li><a href="http://www.jquery2dotnet.com">One more separated link</a></li>
-		                     </ul>
-		                  </li> -->
+		                  <li><a href="#about" data-toggle="modal" data-target="#about">About</a></l>
 		               </ul>
 		               <form class="navbar-form navbar-left" role="search">
 		                  <div class="form-group">
 		                     <div class="input-group custom-search-form">
-				              <input type="text" class="form-control" placeholder="DeviceID">
+				              <input type="text" class="form-control" placeholder="DeviceID" id="DeviceIDSearchBox">
 				              <span class="input-group-btn">
-				              <button  type="submit" class="btn btn-default" type="button">
+				              <button type="button" class="btn btn-default" id="DeviceIDSearchButton">
 				              <span class="glyphicon glyphicon-search"></span>
 				             </button>
 				             </span>
@@ -70,8 +57,7 @@
 		                  </div>
 		               </form>
 		               <ul class="nav navbar-nav navbar-right">
-		                  <li><a href="http://www.jquery2dotnet.com">Sign Up</a></li>
-		                  <li class="dropdown">
+		                  <!--- <li class="dropdown">
 		                     <a href="http://www.jquery2dotnet.com" class="dropdown-toggle" data-toggle="dropdown">Sign in <b class="caret"></b></a>
 		                     <ul class="dropdown-menu" style="padding: 15px;min-width: 250px;">
 		                        <li>
@@ -105,7 +91,7 @@
 		                        </li>
 		                     </ul>
 		                  </li>
-		               </ul>
+		               </ul> -->
 		            </div>
 		            <!-- /.navbar-collapse -->
 		         </nav>
@@ -124,7 +110,7 @@
       </div>
       <div class="modal-body">
       <span>
-      This is a website client for the Miataru service. You can interact with the server side through this website.
+      This is a website client for the Miataru service. You can interact with the server side through this website. To save known devices and quickly access them later your browser needs to support HTML5 Web Storage (Web storage is supported in Internet Explorer 8+, Firefox, Opera, Chrome, and Safari.)
       </span>
       </div>
       <div class="modal-footer">
@@ -134,11 +120,16 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
       
-      
-      
-      
-      
-      
-      
+<script>
+// make the search button work
+document.getElementById('DeviceIDSearchButton').onclick = function() 
+{
+    var search = document.getElementById('DeviceIDSearchBox').value;
+
+    GetLocation(search);
+}
+// fill the drop-down with already saved HTML5 local storage known devices...
+
+</script>
   </body>
 </html>
