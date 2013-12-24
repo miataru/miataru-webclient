@@ -20,4 +20,6 @@ With it's simple API it allows you to use Miataru to your own needs and practice
 
 ## Run the Webclient
 
-Just copy the webclient to any HTTP server that you like and edit the Miataru Service URL in the index.js file (search for service.miataru.com). Please be aware that depending on the URL scheme you're using for your own service you might need to add Custom Headers (e.g. Access-Control-Allow-Origin "*", Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept").
+Just copy the webclient to any HTTP server that you like and edit the Miataru Service URL in the index.js file (search for service.miataru.com). 
+
+Please be aware that depending on the URL scheme you're using for your own service you might need to add Custom Headers (e.g. Access-Control-Allow-Origin "*", Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept").
