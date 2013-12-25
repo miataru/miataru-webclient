@@ -42,8 +42,24 @@
 		            <!-- Collect the nav links, forms, and other content for toggling -->
 		            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 		               <ul class="nav navbar-nav">
-		                  <li><a href="#about" data-toggle="modal" data-target="#about">About</a></l>
+		                  <li><a href="#about" data-toggle="modal" data-target="#about">About</a></li>
 		               </ul>
+		               <ul class="nav navbar-nav">
+
+<li class="dropdown">
+		                  <a href="http://www.jquery2dotnet.com" class="dropdown-toggle" data-toggle="dropdown">Known Devices<b class="caret"></b></a>
+		                     <ul id="knowndeviceslist" class="dropdown-menu" style="padding: 15px;min-width: 250px;">
+		                        <!-- <li>
+		                        	<a href="#element1" data-toggle="modal" data-target="#element1">Element1</a>
+		                        </li>
+		                        <li class="divider"></li>
+		                        <li>
+		                        	<a href="#element2" data-toggle="modal" data-target="#element2">Element2</a>
+		                        </li> -->
+		                     </ul>
+		                  </li>
+
+		               </ul>		               
 		               <form class="navbar-form navbar-left" role="search">
 		                  <div class="form-group">
 		                     <div class="input-group custom-search-form">
@@ -56,42 +72,6 @@
 				             </div><!-- /input-group -->
 		                  </div>
 		               </form>
-		               <ul class="nav navbar-nav navbar-right">
-		                  <!--- <li class="dropdown">
-		                     <a href="http://www.jquery2dotnet.com" class="dropdown-toggle" data-toggle="dropdown">Sign in <b class="caret"></b></a>
-		                     <ul class="dropdown-menu" style="padding: 15px;min-width: 250px;">
-		                        <li>
-		                           <div class="row">
-		                              <div class="col-md-12">
-		                                 <form class="form" role="form" method="post" action="login" accept-charset="UTF-8" id="login-nav">
-		                                    <div class="form-group">
-		                                       <label class="sr-only" for="exampleInputEmail2">Email address</label>
-		                                       <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Email address" required>
-		                                    </div>
-		                                    <div class="form-group">
-		                                       <label class="sr-only" for="exampleInputPassword2">Password</label>
-		                                       <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Password" required>
-		                                    </div>
-		                                    <div class="checkbox">
-		                                       <label>
-		                                       <input type="checkbox"> Remember me
-		                                       </label>
-		                                    </div>
-		                                    <div class="form-group">
-		                                       <button type="submit" class="btn btn-success btn-block">Sign in</button>
-		                                    </div>
-		                                 </form>
-		                              </div>
-		                           </div>
-		                        </li>
-		                        <li class="divider"></li>
-		                        <li>
-		                           <input class="btn btn-primary btn-block" type="button" id="sign-in-google" value="Sign In with Google">
-		                           <input class="btn btn-primary btn-block" type="button" id="sign-in-twitter" value="Sign In with Twitter">
-		                        </li>
-		                     </ul>
-		                  </li>
-		               </ul> -->
 		            </div>
 		            <!-- /.navbar-collapse -->
 		         </nav>
@@ -134,6 +114,31 @@ document.getElementById('DeviceIDSearchButton').onclick = function()
 }
 // fill the drop-down with already saved HTML5 local storage known devices...
 
+// load stuff for the first load...
+if (localStorage.KnownDevices != null)
+{
+	KDList = JSON.parse(localStorage.KnownDevices);
+	
+	makeUL('knowndeviceslist',KDList);
+}
+else
+{
+	 var item = document.createElement('li');
+	 item.innerHTML = "no device known yet.";
+	 document.getElementById('knowndeviceslist').appendChild(item);
+}
+
+
+$(window).load(function(){
+	// look if we got a hash parameter passed
+	if (window.location.hash != "")
+	{
+	    passedDevice = window.location.hash.slice( 1 );
+	    
+	    console.log("User passed a device: "+passedDevice);
+		GetLocation(passedDevice);
+	}
+});
 </script>
 
 <!-- Piwik Tracking Code -->

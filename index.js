@@ -104,20 +104,109 @@ function timeSince(date) {
 
 // HTML5 LocalStorage Handling
 
-
 function AddKnownDevices(Device) 
 {
    // store the searched element in the localstorage...
     if(typeof(Storage)!=="undefined")
 	{
-		// Yes! localStorage and sessionStorage support!
-		KnownDevices = JSON.parse(localStorage.KnownDevices);
-		KnownDevices.push(Device);
+		// get it from LocalStorage or create the LocalStorage...
 		
-		localStorage.KnownDevices = JSON.stringify(KnownDevices);
+		if (localStorage.KnownDevices != null)
+		{
+			// Yes! localStorage and sessionStorage support!
+			KnownDevices = JSON.parse(localStorage.KnownDevices);
+			
+			console.log("KnownDevices Localstorage Content:");
+			// check if the current Device is new or does already exist
+			var deviceExists = false;
+			for( var k=0; k<KnownDevices.length; k++ ) 
+			{
+				console.log(KnownDevices[k]);
+				if (KnownDevices[k].ID == Device.ID)
+				{
+					console.log("Device already in KnownDevices List");
+					deviceExists = true;
+					break;
+				}
+			}
+
+			if (!deviceExists)
+			{
+				console.log("Device not in KnownDevices List, add");
+				KnownDevices.push(Device);
+				localStorage.KnownDevices = JSON.stringify(KnownDevices);
+				makeUL('knowndeviceslist',KnownDevices);
+			}
+
+		}
+		else
+		{
+			// create it new ... and store the first element
+			var KnownDevices = [];
+			KnownDevices.push(Device);
+			
+			localStorage.KnownDevices = JSON.stringify(KnownDevices);
+			
+			makeUL('knowndeviceslist',KnownDevices);
+		}	
+
 	}
 	else
 	{
 		// Sorry! No web storage support..
 	}
+}
+
+
+// MakeUL List Helper function
+function makeUL(placeholderul, array) 
+{
+	// get the UL element to be filled...
+	list = document.getElementById(placeholderul);
+	
+	// clear it first...
+	list.innerHTML="";
+
+    for(var i = 0; i < array.length; i++) {
+        // Create the list item:
+        var item = document.createElement('li');
+		
+		var link = document.createElement("a");
+			//link.id = array[i].ID;
+			link.href = "#"+array[i].ID;
+			link.onclick = function(deviceid) 
+			{ 
+				return function() 
+				{ 
+					GetLocation(deviceid);
+				}; 
+			}(array[i].ID);
+			link.innerHTML = array[i].Name;   
+	
+        // Set its contents:
+		item.appendChild(link);
+
+/*		var link = document.createElement("a");
+			//link.id = array[i].ID;
+			link.href = "#"+array[i].ID;
+			link.onclick = function(deviceid) 
+			{ 
+				return function() 
+				{ 
+					EditKnownDevice(deviceid);
+				}; 
+			}(array[i].ID);
+			link.innerHTML = array[i].Name;   
+	
+        // Set its contents:
+        //item.appendChild(document.createTextNode(array[i].Name));
+		item.appendChild(link);
+*/
+		
+        // Add it to the list:
+        list.appendChild(item);
+    }
+
+    // Finally, return the constructed list:
+    return list;
 }
