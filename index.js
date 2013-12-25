@@ -32,7 +32,7 @@ function GetLocation(DeviceID)
 
 	var GLR = JSON.stringify(GetLocationRequest);
 	
-	console.log(GLR);
+	console.log("Miataru Service Request Body: "+GLR);
 
 	// do the request
 	$.ajax({
@@ -59,6 +59,8 @@ function GetLocation(DeviceID)
 				else
 				{
 					console.log("Device could not be found");
+					$('#doesnotexist').modal();
+					
 				}
 			},
 			error: function(){
@@ -116,12 +118,12 @@ function AddKnownDevices(Device)
 			// Yes! localStorage and sessionStorage support!
 			KnownDevices = JSON.parse(localStorage.KnownDevices);
 			
-			console.log("KnownDevices Localstorage Content:");
+			//console.log("KnownDevices Localstorage Content:");
 			// check if the current Device is new or does already exist
 			var deviceExists = false;
 			for( var k=0; k<KnownDevices.length; k++ ) 
 			{
-				console.log(KnownDevices[k]);
+				//console.log(KnownDevices[k]);
 				if (KnownDevices[k].ID == Device.ID)
 				{
 					console.log("Device already in KnownDevices List");
@@ -157,6 +159,50 @@ function AddKnownDevices(Device)
 	}
 }
 
+var UUID = {
+ // Return a randomly generated v4 UUID, per RFC 4122
+ uuid4: function()
+ {
+  return this._uuid(
+    this.randomInt(), this.randomInt(),
+    this.randomInt(), this.randomInt(), 4);
+ },
+
+ // Create a versioned UUID from w1..w4, 32-bit non-negative ints
+ _uuid: function(w1, w2, w3, w4, version)
+ {
+  var uuid = new Array(36);
+  var data = [
+   (w1 & 0xFFFFFFFF),
+   (w2 & 0xFFFF0FFF) | ((version || 4) << 12), // version (1-5)
+   (w3 & 0x3FFFFFFF) | 0x80000000,    // rfc 4122 variant
+   (w4 & 0xFFFFFFFF)
+  ];
+  for (var i = 0, k = 0; i < 4; i++)
+  {
+   var rnd = data[i];
+   for (var j = 0; j < 8; j++)
+   {
+    if (k == 8 || k == 13 || k == 18 || k == 23) {
+     uuid[k++] = '-';
+    }
+    var r = (rnd >>> 28) & 0xf; // Take the high-order nybble
+    rnd = (rnd & 0x0FFFFFFF) << 4;
+    uuid[k++] = this.hex.charAt(r);
+   }
+  }
+  return uuid.join('');
+ },
+
+ hex: '0123456789abcdef',
+
+ // Return a random integer in [0, 2^32).
+ randomInt: function()
+ {
+  return Math.floor(0x100000000 * Math.random());
+ }
+};
+
 
 // MakeUL List Helper function
 function makeUL(placeholderul, array) 
@@ -170,39 +216,49 @@ function makeUL(placeholderul, array)
     for(var i = 0; i < array.length; i++) {
         // Create the list item:
         var item = document.createElement('li');
+	
+		var devicespan = document.createElement("span");
 		
-		var link = document.createElement("a");
-			//link.id = array[i].ID;
-			link.href = "#"+array[i].ID;
-			link.onclick = function(deviceid) 
+		var devicehref = document.createElement("a");
+			
+			devicehref.href = "#"+array[i].ID;
+			devicehref.onclick = function(deviceid) 
 			{ 
 				return function() 
 				{ 
 					GetLocation(deviceid);
 				}; 
 			}(array[i].ID);
-			link.innerHTML = array[i].Name;   
+			devicehref.innerHTML = array[i].Name;   
 	
-        // Set its contents:
-		item.appendChild(link);
+		var editButton = document.createElement("a");
+			editButton.href = "#"+array[i].ID;
+			editButton.setAttribute("data-toggle", "modal");
+			editButton.setAttribute("data-target", "#editDevice");
 
-/*		var link = document.createElement("a");
-			//link.id = array[i].ID;
-			link.href = "#"+array[i].ID;
-			link.onclick = function(deviceid) 
+			var editButtonImage = document.createElement("i");
+			editButtonImage.setAttribute("class", "pull-right fa fa-pencil-square-o");
+			editButtonImage.onclick = function(deviceid) 
 			{ 
 				return function() 
 				{ 
-					EditKnownDevice(deviceid);
+					$('#editDevice').modal();
 				}; 
 			}(array[i].ID);
-			link.innerHTML = array[i].Name;   
+			devicehref.innerHTML = array[i].Name;
+
+			editButton.appendChild(devicehref);
+			editButton.appendChild(editButtonImage);	
+			editButton.appendChild(devicespan);
+		// now we got the devicehref and the editButton - we need to wrap them in bootstrap grid divs
+		// now wrap in div
 	
-        // Set its contents:
-        //item.appendChild(document.createTextNode(array[i].Name));
-		item.appendChild(link);
-*/
-		
+	
+		devicespan.appendChild(devicehref);
+
+		item.appendChild(editButtonImage);
+		item.appendChild(devicespan);
+
         // Add it to the list:
         list.appendChild(item);
     }

@@ -10,8 +10,10 @@ html, body, #map {
 .container
 {
       position: relative;
-      z-index: 100;
+      z-index: 1000;
       opacity: 0.9;
+      cursor: default;
+      display: block;
 }
 
 .btnStyle {

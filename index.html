@@ -16,6 +16,8 @@
     <link href="css/leaflet.css" rel="stylesheet">
     <!-- LeafletJS Locator CSS -->
     <link href="css/L.Control.Locate.css" rel="stylesheet">
+    <!-- font-awesome CSS -->
+	<link href="css/font-awesome.min.css" rel="stylesheet">
     
     <!-- Custom styles for this template -->
     <link href="index.css" rel="stylesheet">
@@ -25,6 +27,7 @@
 	<script src="js/leaflet.js"></script>
 	<script src="js/L.Control.Locate.js" ></script>
 	<script src="index.js"></script>
+	
   </head>
   
   <body onLoad="javascript:init();">
@@ -45,21 +48,14 @@
 		                  <li><a href="#about" data-toggle="modal" data-target="#about">About</a></li>
 		               </ul>
 		               <ul class="nav navbar-nav">
-
-<li class="dropdown">
-		                  <a href="http://www.jquery2dotnet.com" class="dropdown-toggle" data-toggle="dropdown">Known Devices<b class="caret"></b></a>
+		               	  <li class="dropdown">
+		                  	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Known Devices<b class="caret"></b></a>
 		                     <ul id="knowndeviceslist" class="dropdown-menu" style="padding: 15px;min-width: 250px;">
-		                        <!-- <li>
-		                        	<a href="#element1" data-toggle="modal" data-target="#element1">Element1</a>
-		                        </li>
-		                        <li class="divider"></li>
-		                        <li>
-		                        	<a href="#element2" data-toggle="modal" data-target="#element2">Element2</a>
-		                        </li> -->
+		                     	<!-- here be dragons -->
 		                     </ul>
 		                  </li>
-
 		               </ul>		               
+
 		               <form class="navbar-form navbar-left" role="search">
 		                  <div class="form-group">
 		                     <div class="input-group custom-search-form">
@@ -80,7 +76,7 @@
 		  </div>
       </div>
       
-      <!-- Modal -->
+<!-- Modals -->
 <div class="modal fade" id="about" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -103,6 +99,47 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+      
+<div class="modal fade" id="editDevice" tabindex="-1" role="dialog" aria-labelledby="editDeviceLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="editDeviceLabel">Edit a Known Device</h4>
+      </div>
+      <div class="modal-body">
+      <span>
+      Stuff here...<p>
+      </span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" data-dismiss="modal">Save</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="doesnotexist" tabindex="-1" role="dialog" aria-labelledby="doesnotexistLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="doesnotexistLabel">Device does not exist.</h4>
+      </div>
+      <div class="modal-body">
+      <span>
+      Unfortunately the Device you wanted to view is not available. It might be timed-out or misspelled.<p>
+      </span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
       
 <script>
 // make the search button work
