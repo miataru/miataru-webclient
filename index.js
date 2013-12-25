@@ -13,7 +13,7 @@ map = L.map('map').setView([50.00,10.000], 5);
 // add location control to global name space for testing only
 // on a production site, omit the "lc = "!
 L.control.locate({follow: false}).addTo(map);
-
+L.control.scale().addTo(map);
 //map.on('startfollowing', function() {
 //    map.on('dragstart', lc.stopFollowing);
 //}).on('stopfollowing', function() {
@@ -105,7 +105,6 @@ function timeSince(date) {
 }
 
 // HTML5 LocalStorage Handling
-
 function AddKnownDevices(Device) 
 {
    // store the searched element in the localstorage...
@@ -156,8 +155,95 @@ function AddKnownDevices(Device)
 	else
 	{
 		// Sorry! No web storage support..
+		console.log("Error: Your browser does not support LocalStorage. Please update your browser.");
 	}
 }
+
+function DeleteKnownDevices(DeviceID) 
+{
+   // store the searched element in the localstorage...
+    if(typeof(Storage)!=="undefined")
+	{
+		// get it from LocalStorage or create the LocalStorage...
+		if (localStorage.KnownDevices != null)
+		{
+			// Yes! localStorage and sessionStorage support!
+			KnownDevices = JSON.parse(localStorage.KnownDevices);
+			
+			// we got the KnownDevices... now re-do it without the do-be-deleted element
+			
+			var newKnownDevices = [];
+						
+			for( var k=0; k<KnownDevices.length; k++ ) 
+			{
+				if (KnownDevices[k].ID != DeviceID)
+					newKnownDevices.push(KnownDevices[k]);
+			}
+
+			localStorage.KnownDevices = JSON.stringify(newKnownDevices);
+			makeUL('knowndeviceslist',newKnownDevices);
+		}
+		else
+		{
+			console.log("Error: Device should have been here, it is not... aborting.");
+		}	
+
+	}
+	else
+	{
+		// Sorry! No web storage support..
+		console.log("Error: Your browser does not support LocalStorage. Please update your browser.");
+	}
+}
+
+function UpdateKnownDevices(DeviceID, DeviceName) 
+{
+   // store the searched element in the localstorage...
+    if(typeof(Storage)!=="undefined")
+	{
+		// get it from LocalStorage or create the LocalStorage...
+		if (localStorage.KnownDevices != null)
+		{
+			// Yes! localStorage and sessionStorage support!
+			KnownDevices = JSON.parse(localStorage.KnownDevices);
+			
+			// we got the KnownDevices... now re-do it without the do-be-deleted element
+			
+			var newKnownDevices = [];
+						
+			for( var k=0; k<KnownDevices.length; k++ ) 
+			{
+				if (KnownDevices[k].ID != DeviceID)
+				{
+					newKnownDevices.push(KnownDevices[k]);
+				}
+				else
+				{
+					var _device = {};
+					_device.Name = DeviceName;
+					_device.ID = DeviceID;
+					newKnownDevices.push(_device);	
+				}					
+			}
+
+			localStorage.KnownDevices = JSON.stringify(newKnownDevices);
+			makeUL('knowndeviceslist',newKnownDevices);
+		}
+		else
+		{
+			console.log("Error: Device should have been here, it is not... aborting.");
+		}	
+
+	}
+	else
+	{
+		// Sorry! No web storage support..
+		console.log("Error: Your browser does not support LocalStorage. Please update your browser.");
+	}
+}
+
+
+
 
 var UUID = {
  // Return a randomly generated v4 UUID, per RFC 4122
@@ -237,32 +323,97 @@ function makeUL(placeholderul, array)
 			editButton.setAttribute("data-target", "#editDevice");
 
 			var editButtonImage = document.createElement("i");
-			editButtonImage.setAttribute("class", "pull-right fa fa-pencil-square-o");
-			editButtonImage.onclick = function(deviceid) 
+			editButtonImage.setAttribute("class", "fa fa-pencil-square-o");
+			editButtonImage.setAttribute("style", "padding: 5px");
+			editButtonImage.onclick = function(device) 
 			{ 
 				return function() 
 				{ 
+					// prefill fields...
+					if (document.getElementById("editDevice_DeviceName") != null)
+						document.getElementById("editDevice_DeviceName").value = device.Name;
+					if (document.getElementById("editDevice_DeviceID") != null)
+						document.getElementById("editDevice_DeviceID").innerHTML = device.ID;
+					
+					// call modal
 					$('#editDevice').modal();
 				}; 
-			}(array[i].ID);
+			}(array[i]);
 			devicehref.innerHTML = array[i].Name;
 
+			var deleteButtonImage = document.createElement("i");
+			deleteButtonImage.setAttribute("class", "fa fa-trash-o");
+			deleteButtonImage.setAttribute("style", "padding: 5px");
+			deleteButtonImage.onclick = function(device) 
+			{ 
+				return function() 
+				{ 
+					// prefill fields...
+					if (document.getElementById("delete_deviceName") != null)
+						document.getElementById("delete_deviceName").innerHTML = device.Name;
+					if (document.getElementById("delete_deviceID") != null)
+						document.getElementById("delete_deviceID").innerHTML = device.ID;
+
+					// call modal
+					$('#deleteDevice').modal();
+				}; 
+			}(array[i]);
+			devicehref.innerHTML = array[i].Name;
+
+
 			editButton.appendChild(devicehref);
-			editButton.appendChild(editButtonImage);	
+			editButton.appendChild(editButtonImage);
 			editButton.appendChild(devicespan);
 		// now we got the devicehref and the editButton - we need to wrap them in bootstrap grid divs
 		// now wrap in div
-	
-	
+
+/*
 		devicespan.appendChild(devicehref);
 
 		item.appendChild(editButtonImage);
 		item.appendChild(devicespan);
 
         // Add it to the list:
-        list.appendChild(item);
+        list.appendChild(item);*/
+        
+        var inputgroup = document.createElement("div");
+        inputgroup.setAttribute("class", "input-group");
+        
+        inputgroup.appendChild(devicehref);
+        
+        var spanbutton = document.createElement("span");
+        spanbutton.setAttribute("class", "input-group-addon");
+        
+        spanbutton.appendChild(editButtonImage);
+        spanbutton.appendChild(deleteButtonImage);
+        
+        inputgroup.appendChild(spanbutton);
+        
+        item.appendChild(inputgroup);
+        list.appendChild(item);        
     }
 
     // Finally, return the constructed list:
     return list;
+}
+
+// Delete a device
+function DeleteDevice()
+{
+	// get the UL element to be filled...
+	deleteDeviceID = document.getElementById("delete_deviceID").innerHTML;
+
+	console.log("Deleting Device: "+deleteDeviceID);
+	DeleteKnownDevices(deleteDeviceID);	
+}
+
+// update a device
+function UpdateDevice()
+{
+	// get the UL element to be filled...
+	updateDeviceID = document.getElementById("editDevice_DeviceID").innerHTML;
+	updateDeviceName = document.getElementById("editDevice_DeviceName").value;
+	console.log("Updateing Device: "+updateDeviceID);
+	
+	UpdateKnownDevices(updateDeviceID,updateDeviceName);	
 }

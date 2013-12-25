@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="images/favicon.png">
 
-    <title>Miataru Client</title>
+    <title>Miataru Client Application</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.css" rel="stylesheet">
@@ -61,7 +61,7 @@
 		                     <div class="input-group custom-search-form">
 				              <input type="text" class="form-control" placeholder="DeviceID" id="DeviceIDSearchBox">
 				              <span class="input-group-btn">
-				              <button type="button" class="btn btn-default" id="DeviceIDSearchButton">
+				              	<button type="button" class="btn btn-default" id="DeviceIDSearchButton">
 				              <span class="glyphicon glyphicon-search"></span>
 				             </button>
 				             </span>
@@ -108,12 +108,72 @@
         <h4 class="modal-title" id="editDeviceLabel">Edit a Known Device</h4>
       </div>
       <div class="modal-body">
+      <div align="center">
+	      <table style="width: 100%;">
+	      	<tr>
+	      		<td>
+	      		Name
+	      		</td>
+	      		<td>
+					<span>
+						<input id="editDevice_DeviceName" type="text" class="form-control">
+					</span>
+	      		</td>
+	      	</tr>
+	      	<tr>
+	      		<td>
+	      		ID
+	      		</td>
+	      		<td>
+		      		<span id="editDevice_DeviceID"></span>
+	      		</td>
+	      	</tr>
+	      </table>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-dismiss="modal" onclick="UpdateDevice()">Save</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="deleteDevice" tabindex="-1" role="dialog" aria-labelledby="deleteDeviceLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="deleteDeviceLabel">Do you really want to remove the device?</h4>
+      </div>
+      <div class="modal-body">
       <span>
-      Stuff here...<p>
+      Do you really want to delete this device: <p>
+      <div align="center">
+	      <table>
+	      	<tr>
+	      		<td>
+	      		Name
+	      		</td>
+	      		<td>
+		      		<span id="delete_deviceName"></span>
+	      		</td>
+	      	</tr>
+	      	<tr>
+	      		<td>
+	      		ID
+	      		</td>
+	      		<td>
+		      		<span id="delete_deviceID"></span>
+	      		</td>
+	      	</tr>
+	      </table>
+      </div>
+	    	
       </span>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" data-dismiss="modal">Save</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="DeleteDevice()">Delete</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div><!-- /.modal-content -->
