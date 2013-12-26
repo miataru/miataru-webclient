@@ -68,7 +68,7 @@ function GetLocation(DeviceID)
 				},
 			processData: false,
 			type: 'POST',
-			url: 'http://service.miataru.com/v1/GetLocation'
+			url: 'https://service.miataru.com/v1/GetLocation'
 		   });
 	
 }
