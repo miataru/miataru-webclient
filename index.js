@@ -74,6 +74,31 @@ function AddMarkerDistinct(newMarkerObject)
 		return oldobject;
 }
 
+function GetNameForDeviceID(DeviceID)
+{
+	if(typeof(Storage)!=="undefined")
+	{
+		// get it from LocalStorage or create the LocalStorage...
+		if (localStorage.KnownDevices != null)
+		{
+			// Yes! localStorage and sessionStorage support!
+			KnownDevices = JSON.parse(localStorage.KnownDevices);
+			
+			//console.log("KnownDevices Localstorage Content:");
+			// check if the current Device is new or does already exist
+			for( var k=0; k<KnownDevices.length; k++ ) 
+			{
+				//console.log(KnownDevices[k]);
+				if (KnownDevices[k].ID == DeviceID)
+				{
+					return KnownDevices[k].Name;
+				}
+			}
+		}
+		return DeviceID;
+	
+	}
+}
 
 function GetLocation(DeviceID)
 {
@@ -100,7 +125,7 @@ function GetLocation(DeviceID)
 				if (data.MiataruLocation[0] != null)
 				{
 					// the Name
-					var deviceName = data.MiataruLocation[0].Device + " - "+ timeSince(data.MiataruLocation[0].Timestamp)+ " ago";
+					var deviceName = GetNameForDeviceID(data.MiataruLocation[0].Device) + " - "+ timeSince(data.MiataruLocation[0].Timestamp)+ " ago";
 					
 					var newMarker = new L.marker([data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude]);		
 				
