@@ -49,3 +49,9 @@ html, body, #map {
 .input-group .form-control{
 	width: 335px;
 }
+
+.input-group-addon
+{
+	background-color: white;
+	border: 0px;
+}

@@ -1,26 +1,76 @@
 var map;
+var markers; // this will hold all markers we put on the map...
+var markerUpdateTimer;	// this will hold the object for the setInterval timer to auto-update the last set marker...
 
 function init() 
 {
-map = L.map('map').setView([50.00,10.000], 5);
+	map = L.map('map').setView([50.00,10.000], 5);
 
-		L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
-			maxZoom: 18,
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+	L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
 		}).addTo(map);
-
 		
 // add location control to global name space for testing only
 // on a production site, omit the "lc = "!
 L.control.locate({follow: false}).addTo(map);
+
+var button = new L.Control.Button('Toggle me', {
+  toggleButton: 'active',
+  className: 'leaflet-control-locate leaflet-bar leaflet-control leaflet-bar-part leaflet-bar-part-single'
+});
+button.addTo(map);
+button.on('click', function () {
+    if (button.isToggled()) {
+        sidebar.hide();
+    } else {
+        sidebar.show();
+    }
+});
+
+
 L.control.scale().addTo(map);
+
 //map.on('startfollowing', function() {
 //    map.on('dragstart', lc.stopFollowing);
 //}).on('stopfollowing', function() {
 //    map.off('dragstart', lc.stopFollowing);
 //});
-		
 }
+
+function AddMarkerDistinct(newMarkerObject)
+{
+	if (markers == null)
+		markers = [];
+	if (newMarkerObject.ID == null)
+		return;
+	if (newMarkerObject.Marker == null)
+		return;
+	
+	// check if it's already in...
+	var foundmarker = false;
+	for( var k=0; k<markers.length; k++ ) 
+	{
+		//console.log(KnownDevices[k]);
+		if (markers[k].ID == newMarkerObject.ID)
+		{
+			console.log("Device already on the marker list");
+			foundmarker = true;
+			map.removeLayer(markers[k].Marker);
+			oldobject = markers[k].Marker;
+			
+			markers[k] = newMarkerObject;
+			break;
+		}
+	}
+	if (!foundmarker)
+	{
+		markers.push(newMarkerObject);
+	}
+	else
+		return oldobject;
+}
+
 
 function GetLocation(DeviceID)
 {
@@ -46,15 +96,29 @@ function GetLocation(DeviceID)
 
 				if (data.MiataruLocation[0] != null)
 				{
-					//var map = L.map('map')				
+					// the Name
 					var deviceName = data.MiataruLocation[0].Device + " - "+ timeSince(data.MiataruLocation[0].Timestamp)+ " ago";
-					L.marker([data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude]).addTo(map).bindPopup(deviceName);
-					map.fitBounds([[data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude]]);
 					
+					var newMarker = new L.marker([data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude]);		
+					
+					newMarker.addTo(map).bindPopup(deviceName);
+					
+					var newMarkerObject = {};
+					newMarkerObject.ID = DeviceID;
+					newMarkerObject.Marker = newMarker;
+
+					oldObject = AddMarkerDistinct(newMarkerObject);
+					
+					//map.fitBounds([[data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude]]);
+					map.panTo(new L.LatLng(data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude));
 					var Device = {};
 					Device.Name = DeviceID;
 					Device.ID = DeviceID;
-					AddKnownDevices(Device);
+					
+					// set the timer for this device...
+					markerUpdateTimer = setTimeout(function () { GetLocation(DeviceID); }, 5000);
+					
+					AddKnownDevices(Device);					
 				}
 				else
 				{
@@ -312,6 +376,9 @@ function makeUL(placeholderul, array)
 			{ 
 				return function() 
 				{ 
+					// remove any existing timers...
+					clearTimeout(markerUpdateTimer);
+					
 					GetLocation(deviceid);
 				}; 
 			}(array[i].ID);
@@ -325,6 +392,7 @@ function makeUL(placeholderul, array)
 			var editButtonImage = document.createElement("i");
 			editButtonImage.setAttribute("class", "fa fa-pencil-square-o");
 			editButtonImage.setAttribute("style", "padding: 5px");
+			//editButtonImage.setAttribute("alt", "Edit this Device");
 			editButtonImage.onclick = function(device) 
 			{ 
 				return function() 
@@ -344,6 +412,7 @@ function makeUL(placeholderul, array)
 			var deleteButtonImage = document.createElement("i");
 			deleteButtonImage.setAttribute("class", "fa fa-trash-o");
 			deleteButtonImage.setAttribute("style", "padding: 5px");
+			//deleteButtonImage.setAttribute("alt", "Delete this device");
 			deleteButtonImage.onclick = function(device) 
 			{ 
 				return function() 

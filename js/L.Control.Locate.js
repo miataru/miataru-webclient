@@ -55,8 +55,7 @@ L.Control.Locate = L.Control.extend({
     },
 
     onAdd: function (map) {
-        var container = L.DomUtil.create('div',
-            'leaflet-control-locate leaflet-bar leaflet-control');
+        var container = L.DomUtil.create('div','leaflet-control-locate leaflet-bar leaflet-control');
 
         var self = this;
         this._layer = new L.LayerGroup();
