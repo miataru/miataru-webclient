@@ -1,6 +1,7 @@
 var map;
 var markers; // this will hold all markers we put on the map...
 var markerUpdateTimer;	// this will hold the object for the setInterval timer to auto-update the last set marker...
+var followMarkerUpdates = true;
 
 function init() 
 {
@@ -16,15 +17,17 @@ function init()
 L.control.locate({follow: false}).addTo(map);
 
 var button = new L.Control.Button('Toggle me', {
-  toggleButton: 'active',
-  className: 'leaflet-control-locate leaflet-bar leaflet-control leaflet-bar-part leaflet-bar-part-single'
+  toggleButton: 'active'
 });
 button.addTo(map);
 button.on('click', function () {
     if (button.isToggled()) {
-        sidebar.hide();
+       	console.log("Marker Following ON");
+        followMarkerUpdates = true;
     } else {
-        sidebar.show();
+    	console.log("Marker Following OFF");
+		followMarkerUpdates = false;
+
     }
 });
 
@@ -56,7 +59,6 @@ function AddMarkerDistinct(newMarkerObject)
 		{
 			console.log("Device already on the marker list");
 			foundmarker = true;
-			map.removeLayer(markers[k].Marker);
 			oldobject = markers[k].Marker;
 			
 			markers[k] = newMarkerObject;
@@ -66,6 +68,7 @@ function AddMarkerDistinct(newMarkerObject)
 	if (!foundmarker)
 	{
 		markers.push(newMarkerObject);
+		return null;
 	}
 	else
 		return oldobject;
@@ -100,17 +103,38 @@ function GetLocation(DeviceID)
 					var deviceName = data.MiataruLocation[0].Device + " - "+ timeSince(data.MiataruLocation[0].Timestamp)+ " ago";
 					
 					var newMarker = new L.marker([data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude]);		
-					
-					newMarker.addTo(map).bindPopup(deviceName);
-					
+				
 					var newMarkerObject = {};
 					newMarkerObject.ID = DeviceID;
 					newMarkerObject.Marker = newMarker;
 
 					oldObject = AddMarkerDistinct(newMarkerObject);
+
+					var addToMap = true;
 					
+					if (newMarkerObject != null && oldObject != null)
+					{
+						if (newMarkerObject.Marker.getLatLng().lat == oldObject.getLatLng().lat && newMarkerObject.Marker.getLatLng().lng == oldObject.getLatLng().lng)
+						{
+							// it's equal... do not add
+							console.log("We already have that Marker, don't add it again...");
+							addToMap = false;
+						}						
+					}
+					
+					if (addToMap)
+					{
+						// remove the old one
+						if (oldObject != null)
+							map.removeLayer(oldObject);
+						// add the new one...
+						newMarker.addTo(map).bindPopup(deviceName);
+					}
+
 					//map.fitBounds([[data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude]]);
-					map.panTo(new L.LatLng(data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude));
+					if (followMarkerUpdates && addToMap)
+						map.panTo(new L.LatLng(data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude));
+					
 					var Device = {};
 					Device.Name = DeviceID;
 					Device.ID = DeviceID;
@@ -118,7 +142,7 @@ function GetLocation(DeviceID)
 					// set the timer for this device...
 					markerUpdateTimer = setTimeout(function () { GetLocation(DeviceID); }, 5000);
 					
-					AddKnownDevices(Device);					
+					AddKnownDevices(Device);
 				}
 				else
 				{
