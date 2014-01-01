@@ -51,7 +51,7 @@
 		               <ul class="nav navbar-nav">
 		               	  <li class="dropdown">
 		                  	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Known Devices<b class="caret"></b></a>
-		                     <ul id="knowndeviceslist" class="dropdown-menu" style="padding: 15px;min-width: 250px;">
+		                     <ul id="knowndeviceslist" class="dropdown-menu" style="padding: 15px;min-width: 250px; overflow-y: scroll; height:400px;">
 		                     	<!-- here be dragons -->
 		                     </ul>
 		                  </li>
@@ -225,6 +225,7 @@ else
 {
 	 var item = document.createElement('li');
 	 item.innerHTML = "no device known yet.";
+	 
 	 document.getElementById('knowndeviceslist').appendChild(item);
 }
 
