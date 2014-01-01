@@ -209,7 +209,9 @@
 document.getElementById('DeviceIDSearchButton').onclick = function() 
 {
     var search = document.getElementById('DeviceIDSearchBox').value;
-
+	
+	// remove any existing timers...
+	clearTimeout(markerUpdateTimer);
     GetLocation(search);
 }
 // fill the drop-down with already saved HTML5 local storage known devices...
