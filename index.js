@@ -5,7 +5,7 @@ var followMarkerUpdates = true;
 
 function init() 
 {
-	map = L.map('map').setView([50.00,10.000], 5);
+	map = L.map('map').setView([50.00,10.000], 10);
 
 	L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
 		maxZoom: 18,
@@ -39,6 +39,25 @@ L.control.scale().addTo(map);
 //}).on('stopfollowing', function() {
 //    map.off('dragstart', lc.stopFollowing);
 //});
+}
+
+function DoesMarkerForDeviceIDExist(DeviceID)
+{
+	if (markers == null)
+		markers = [];
+		
+	if (DeviceID == null)
+		return;
+
+	for( var k=0; k<markers.length; k++ ) 
+	{
+		//console.log(KnownDevices[k]);
+		if (markers[k].ID == DeviceID)
+		{
+			return markers[k].Marker;
+		}
+	}
+	return;
 }
 
 function AddMarkerDistinct(newMarkerObject)
@@ -133,40 +152,43 @@ function GetLocation(DeviceID)
 					newMarkerObject.ID = DeviceID;
 					newMarkerObject.Marker = newMarker;
 
-					oldObject = AddMarkerDistinct(newMarkerObject);
-
-					var addToMap = true;
+					existingMarker = DoesMarkerForDeviceIDExist(DeviceID);
 					
-					if (newMarkerObject != null && oldObject != null)
+					// this is null if not existing, or has the Marker if it exists...
+					var addToMap = true;
+					if (existingMarker != null)
 					{
-						if (newMarkerObject.Marker.getLatLng().lat == oldObject.getLatLng().lat && newMarkerObject.Marker.getLatLng().lng == oldObject.getLatLng().lng)
+						// obviously the marker did exist previously... so we have to check it...
+						if (newMarkerObject.Marker.getLatLng().lat == existingMarker.getLatLng().lat && newMarkerObject.Marker.getLatLng().lng == existingMarker.getLatLng().lng)
 						{
 							// it's equal... do not add
-							console.log("We already have that Marker, don't add it again...");
 							addToMap = false;
-						}						
+						}		
 					}
-					
+
+					// should it be added?					
 					if (addToMap)
 					{
+						oldObject = AddMarkerDistinct(newMarkerObject);
 						// remove the old one
 						if (oldObject != null)
 							map.removeLayer(oldObject);
-						// add the new one...
-						newMarker.addTo(map).bindPopup(deviceName);
-					}
 
-					//map.fitBounds([[data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude]]);
-					if (followMarkerUpdates && addToMap)
-						map.panTo(new L.LatLng(data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude));
+						newMarker.addTo(map).bindPopup(deviceName);
+						
+						if (followMarkerUpdates)
+							map.panTo(new L.LatLng(data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude));
+
+					}
 					
+
 					var Device = {};
 					Device.Name = DeviceID;
 					Device.ID = DeviceID;
 					
 					// set the timer for this device...
 					markerUpdateTimer = setTimeout(function () { GetLocation(DeviceID); }, 5000);
-					
+
 					AddKnownDevices(Device);
 				}
 				else
