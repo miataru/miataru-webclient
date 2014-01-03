@@ -165,8 +165,9 @@ function GetLocation(DeviceID)
 						// obviously the marker did exist previously... so we have to check it...
 						if (newMarkerObject.Marker.getLatLng().lat == existingMarker.getLatLng().lat && newMarkerObject.Marker.getLatLng().lng == existingMarker.getLatLng().lng)
 						{
-							// it's equal... do not add
-							addToMap = false;
+							// it's equal... do not add - just update the popup
+							addToMap = false; 
+							existingMarker.getPopup().setContent(deviceName).update();
 						}		
 					}
 
