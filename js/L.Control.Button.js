@@ -26,6 +26,9 @@ L.Control.Button = L.Control.extend({
     includes: L.Mixin.Events,
     options: {
         position: 'topleft',
+		className: 'leafletButton',
+		toggleButton: 'active',
+		Title: 'Enable/Disable tracking on map'
     },
     initialize: function (label, options) {
         L.setOptions(this, options);
@@ -39,6 +42,7 @@ L.Control.Button = L.Control.extend({
         } else if (typeof label === "string") 
         {
             button = L.DomUtil.create('button', this.options.className);
+            button.title = this.options.Title;
         } else {
             throw new Error('L.Control.Button: failed to initialize, label must either be text or a dom element');
         }
