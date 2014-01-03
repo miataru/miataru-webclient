@@ -68,6 +68,8 @@ function AddMarkerDistinct(newMarkerObject)
 		return;
 	if (newMarkerObject.Marker == null)
 		return;
+	if (newMarkerObject.Circle == null)
+		return;
 	
 	// check if it's already in...
 	var foundmarker = false;
@@ -78,7 +80,7 @@ function AddMarkerDistinct(newMarkerObject)
 		{
 			console.log("Device already on the marker list");
 			foundmarker = true;
-			oldobject = markers[k].Marker;
+			oldobject = markers[k];
 			
 			markers[k] = newMarkerObject;
 			break;
@@ -147,10 +149,12 @@ function GetLocation(DeviceID)
 					var deviceName = GetNameForDeviceID(data.MiataruLocation[0].Device) + " - "+ timeSince(data.MiataruLocation[0].Timestamp)+ " ago";
 					
 					var newMarker = new L.marker([data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude]);		
+					var newCircle = new L.circle([data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude],data.MiataruLocation[0].HorizontalAccuracy);
 				
 					var newMarkerObject = {};
 					newMarkerObject.ID = DeviceID;
 					newMarkerObject.Marker = newMarker;
+					newMarkerObject.Circle = newCircle;
 
 					existingMarker = DoesMarkerForDeviceIDExist(DeviceID);
 					
@@ -172,8 +176,12 @@ function GetLocation(DeviceID)
 						oldObject = AddMarkerDistinct(newMarkerObject);
 						// remove the old one
 						if (oldObject != null)
-							map.removeLayer(oldObject);
-
+						{
+							map.removeLayer(oldObject.Marker);
+							map.removeLayer(oldObject.Circle);
+						}
+							
+						newCircle.addTo(map);
 						newMarker.addTo(map).bindPopup(deviceName).openPopup();
 						
 						if (followMarkerUpdates)
