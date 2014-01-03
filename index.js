@@ -174,7 +174,7 @@ function GetLocation(DeviceID)
 						if (oldObject != null)
 							map.removeLayer(oldObject);
 
-						newMarker.addTo(map).bindPopup(deviceName);
+						newMarker.addTo(map).bindPopup(deviceName).openPopup();
 						
 						if (followMarkerUpdates)
 							map.panTo(new L.LatLng(data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude));
