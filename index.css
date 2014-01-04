@@ -71,10 +71,15 @@ html, body, #map {
 	height: 26px;
 	width: 26px;
 	background-image: url(images/button.png);
-	background-position: -3px -2px;
+	background-position: -4px -2px;
+}
+
+.leafletButton:hover {
+	background-color: #ededed;
 }
 
 .active {
-	background-position: -33px -2px;	
+	background-position: -34px -2px;	
 }
+
 
