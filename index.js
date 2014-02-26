@@ -7,9 +7,10 @@ function init()
 {
 	map = L.map('map').setView([50.00,10.000], 10);
 
-	L.tileLayer('http://{s}.tile.cloudmade.com/1007c879cfc0485486e05b94ee5dc15c/997/256/{z}/{x}/{y}.png', {
+	L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	//L.tileLayer('http://{s}.tile.cloudmade.com/1007c879cfc0485486e05b94ee5dc15c/997/256/{z}/{x}/{y}.png', {
 		maxZoom: 18,
-		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 		}).addTo(map);
 		
 // add location control to global name space for testing only
