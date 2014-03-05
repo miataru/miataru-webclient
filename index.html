@@ -208,14 +208,22 @@
       
 <script>
 // make the search button work
-document.getElementById('DeviceIDSearchButton').onclick = function() 
-{
-    var search = document.getElementById('DeviceIDSearchBox').value;
-	
-	// remove any existing timers...
-	clearTimeout(markerUpdateTimer);
-    GetLocation(search);
-}
+$(document).ready( function() {
+
+    /** Bind onclick event to search button **/
+    $('#DeviceIDSearchButton').bind('click', function(){
+        deviceID = $('#DeviceIDSearchBox').val();
+        if(0 == $.trim(deviceID).length) {
+            return;
+        }
+        
+        clearTimeout(markerUpdateTimer);
+        GetLocation(deviceID);
+    })
+
+    
+})
+
 // fill the drop-down with already saved HTML5 local storage known devices...
 
 // load stuff for the first load...
