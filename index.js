@@ -5,7 +5,12 @@ var followMarkerUpdates = true;
 
 function init() 
 {
-	map = L.map('map').setView([50.00,10.000], 10);
+	MapState = getMapState();
+	
+	if (MapState != null)
+		map = L.map('map').setView([MapState.Latitude,MapState.Longitude], MapState.ZoomLevel);
+	else
+		map = L.map('map').setView([50.00,10.000], 10);
 
 	L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	//L.tileLayer('http://{s}.tile.cloudmade.com/1007c879cfc0485486e05b94ee5dc15c/997/256/{z}/{x}/{y}.png', {
@@ -16,6 +21,15 @@ function init()
 // add location control to global name space for testing only
 // on a production site, omit the "lc = "!
 L.control.locate({follow: false}).addTo(map);
+
+map.on("zoomend", function (e) { 
+	saveState(map.getZoom(), map.getCenter().lng, map.getCenter().lat);
+});
+
+map.on("dragend", function (e) { 
+	saveState(map.getZoom(), map.getCenter().lng, map.getCenter().lat);
+});
+
 
 var button = new L.Control.Button('Toggle me', {
   toggleButton: 'active'
@@ -387,9 +401,6 @@ function UpdateKnownDevices(DeviceID, DeviceName)
 	}
 }
 
-
-
-
 var UUID = {
  // Return a randomly generated v4 UUID, per RFC 4122
  uuid4: function()
@@ -567,3 +578,40 @@ function UpdateDevice()
 	
 	UpdateKnownDevices(updateDeviceID,updateDeviceName);	
 }
+
+function saveState(ZoomLevel, Longitude, Latitude)
+{
+   // store the searched element in the localstorage...
+    if(typeof(Storage)!=="undefined")
+	{
+		var MapState = new Object();
+		MapState.ZoomLevel = ZoomLevel;
+		MapState.Longitude = Longitude;
+		MapState.Latitude = Latitude;
+					
+		localStorage.MapState = JSON.stringify(MapState);
+	}
+	else
+	{
+		// Sorry! No web storage support..
+		console.log("Error: Your browser does not support LocalStorage. Please update your browser.");
+	}
+}
+
+function getMapState()
+ {
+    if(typeof(Storage)!=="undefined")
+	{
+		// get it from LocalStorage or create the LocalStorage...
+		if (localStorage.MapState != null)
+		{
+			// Yes! localStorage and sessionStorage support!
+			return JSON.parse(localStorage.MapState);
+		}
+	}
+	else
+	{
+		// Sorry! No web storage support..
+		console.log("Error: Your browser does not support LocalStorage. Please update your browser.");
+	}
+ }
