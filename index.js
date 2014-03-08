@@ -183,6 +183,7 @@ function GetLocation(DeviceID)
 							// it's equal... do not add - just update the popup
 							addToMap = false; 
 							existingMarker.getPopup().setContent(deviceName).update();
+							existingMarker.openPopup();
 						}		
 					}
 
@@ -472,6 +473,17 @@ function makeUL(placeholderul, array)
 					clearTimeout(markerUpdateTimer);
 					
 					GetLocation(deviceid);
+					
+					// check if we should zoom...
+					existingmarker = DoesMarkerForDeviceIDExist(deviceid);
+				
+					if (existingmarker != null)
+					{
+						//console.log("!!!!!!!!!!!!!!!!!!!!!",existingmarker);
+						existingmarker.openPopup();
+						map.panTo(existingmarker.getLatLng());
+					}		
+					
 				}; 
 			}(array[i].ID);
 			devicehref.innerHTML = array[i].Name;   
