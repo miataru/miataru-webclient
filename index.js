@@ -474,9 +474,6 @@ function makeUL(placeholderul, array)
 					
 					GetLocation(deviceid);
 					
-					// save the state
-					saveState(map.getZoom(), map.getCenter().lng, map.getCenter().lat);
-					
 					// check if we should zoom...
 					existingmarker = DoesMarkerForDeviceIDExist(deviceid);
 				
@@ -485,6 +482,9 @@ function makeUL(placeholderul, array)
 						//console.log("!!!!!!!!!!!!!!!!!!!!!",existingmarker);
 						existingmarker.openPopup();
 						map.panTo(existingmarker.getLatLng());
+						
+						// save the state
+						saveState(map.getZoom(), map.getCenter().lng, map.getCenter().lat);
 					}		
 					
 				}; 
