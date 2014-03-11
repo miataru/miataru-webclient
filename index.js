@@ -474,6 +474,9 @@ function makeUL(placeholderul, array)
 					
 					GetLocation(deviceid);
 					
+					// save the state
+					saveState(map.getZoom(), map.getCenter().lng, map.getCenter().lat);
+					
 					// check if we should zoom...
 					existingmarker = DoesMarkerForDeviceIDExist(deviceid);
 				
