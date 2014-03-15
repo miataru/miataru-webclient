@@ -12,7 +12,8 @@ function init()
 	else
 		map = L.map('map').setView([50.00,10.000], 10);
 
-	L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	L.tileLayer('http://maps.miataru.com/osm/{z}/{x}/{y}.png', {
+	//L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	//L.tileLayer('http://{s}.tile.cloudmade.com/1007c879cfc0485486e05b94ee5dc15c/997/256/{z}/{x}/{y}.png', {
 		maxZoom: 18,
 		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
@@ -20,7 +21,8 @@ function init()
 		
 // add location control to global name space for testing only
 // on a production site, omit the "lc = "!
-L.control.locate({follow: false}).addTo(map);
+if (L.control.locate != null)
+	L.control.locate({follow: false}).addTo(map);
 
 map.on("zoomend", function (e) { 
 	saveState(map.getZoom(), map.getCenter().lng, map.getCenter().lat);
@@ -31,20 +33,24 @@ map.on("dragend", function (e) {
 });
 
 
-var button = new L.Control.Button('Toggle me', {
-  toggleButton: 'active'
-});
-button.addTo(map);
-button.on('click', function () {
-    if (button.isToggled()) {
-       	console.log("Marker Following ON");
-        followMarkerUpdates = true;
-    } else {
-    	console.log("Marker Following OFF");
-		followMarkerUpdates = false;
+if (L.Control.Button != null)
+{
+	var button = new L.Control.Button('Toggle me', {
+	  toggleButton: 'active'
+	});
+	button.addTo(map);
+	button.on('click', function () {
+	    if (button.isToggled()) {
+	       	console.log("Marker Following ON");
+	        followMarkerUpdates = true;
+	    } else {
+	    	console.log("Marker Following OFF");
+			followMarkerUpdates = false;
+	
+	    }
+	});
+}
 
-    }
-});
 
 
 L.control.scale().addTo(map);
@@ -453,7 +459,9 @@ function makeUL(placeholderul, array)
 	// get the UL element to be filled...
 	list = document.getElementById(placeholderul);
 	
-	// clear it first...
+	if (list != null)
+	{
+			// clear it first...
 	list.innerHTML="";
 
     for(var i = 0; i < array.length; i++) {
@@ -482,6 +490,9 @@ function makeUL(placeholderul, array)
 						//console.log("!!!!!!!!!!!!!!!!!!!!!",existingmarker);
 						existingmarker.openPopup();
 						map.panTo(existingmarker.getLatLng());
+						
+						// save the state
+						saveState(map.getZoom(), map.getCenter().lng, map.getCenter().lat);
 					}		
 					
 				}; 
@@ -568,6 +579,8 @@ function makeUL(placeholderul, array)
 
     // Finally, return the constructed list:
     return list;
+
+	}
 }
 
 // Delete a device

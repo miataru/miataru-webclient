@@ -56,6 +56,9 @@
 		                     </ul>
 		                  </li>
 		               </ul>		               
+		               <ul class="nav navbar-nav">
+		                  <li><a href="#widgetModal" data-toggle="modal" data-target="#widgetModal">Embed</a></li>
+		               </ul>
 
 		               <form class="navbar-form navbar-left" role="search">
 		                  <div class="form-group">
@@ -78,6 +81,36 @@
       </div>
       
 <!-- Modals -->
+<div class="modal fade" id="widgetModal" tabindex="-1" role="dialog" aria-labelledby="widgetModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Embed a device into your own website</h4>
+      </div>
+      <div class="modal-body">
+      <span>
+	  You can embed a device into a website by adding the following pattern to your websites HTML:
+	 <pre><code>
+&lt;iframe width="320" scrolling="no" height="240" frameborder="0" src="http://miataru.com/client/embed.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device"&gt;&lt;/iframe&gt;
+	 </code></pre>
+      </span>
+      <span>
+      You have to change the above code snippet to contain the DeviceID (BF01...) and the Device Name (separated after the DeviceID with a ;).
+      <p>
+      Example:
+      <p>
+      </span>
+	      <iframe width="558" scrolling="no" height="240" frameborder="0" src="http://miataru.com/client/embed.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device"></iframe>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
 <div class="modal fade" id="about" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
