@@ -3,6 +3,14 @@ var markers; // this will hold all markers we put on the map...
 var markerUpdateTimer;	// this will hold the object for the setInterval timer to auto-update the last set marker...
 var followMarkerUpdates = true;
 
+function htmlEncode(value){  
+     //create a in-memory div, set it's inner text(which jQuery automatically encodes)   //then grab the encoded contents back out.  The div never exists on the page.   
+    return $('<div/>').text(value).html(); 
+}  
+function htmlDecode(value){   
+return $('<div/>').html(value).text(); 
+}
+
 function init() 
 {
 	MapState = getMapState();
@@ -133,7 +141,7 @@ function GetNameForDeviceID(DeviceID)
 				//console.log(KnownDevices[k]);
 				if (KnownDevices[k].ID == DeviceID)
 				{
-					return KnownDevices[k].Name;
+					return htmlEncode(decodeURIComponent(KnownDevices[k].Name));
 				}
 			}
 		}
@@ -497,7 +505,7 @@ function makeUL(placeholderul, array)
 					
 				}; 
 			}(array[i].ID);
-			devicehref.innerHTML = array[i].Name;   
+			devicehref.innerHTML = htmlEncode(decodeURIComponent(array[i].Name));   
 	
 		var editButton = document.createElement("a");
 			editButton.href = "#"+array[i].ID;
@@ -514,7 +522,7 @@ function makeUL(placeholderul, array)
 				{ 
 					// prefill fields...
 					if (document.getElementById("editDevice_DeviceName") != null)
-						document.getElementById("editDevice_DeviceName").value = device.Name;
+						document.getElementById("editDevice_DeviceName").value = htmlEncode(decodeURIComponent(device.Name));
 					if (document.getElementById("editDevice_DeviceID") != null)
 						document.getElementById("editDevice_DeviceID").innerHTML = device.ID;
 					
@@ -522,7 +530,7 @@ function makeUL(placeholderul, array)
 					$('#editDevice').modal();
 				}; 
 			}(array[i]);
-			devicehref.innerHTML = array[i].Name;
+			devicehref.innerHTML = htmlEncode(decodeURIComponent(array[i].Name));
 
 			var deleteButtonImage = document.createElement("i");
 			deleteButtonImage.setAttribute("class", "fa fa-trash-o");
@@ -534,7 +542,7 @@ function makeUL(placeholderul, array)
 				{ 
 					// prefill fields...
 					if (document.getElementById("delete_deviceName") != null)
-						document.getElementById("delete_deviceName").innerHTML = device.Name;
+						document.getElementById("delete_deviceName").innerHTML = htmlEncode(decodeURIComponent(device.Name));
 					if (document.getElementById("delete_deviceID") != null)
 						document.getElementById("delete_deviceID").innerHTML = device.ID;
 
@@ -542,7 +550,7 @@ function makeUL(placeholderul, array)
 					$('#deleteDevice').modal();
 				}; 
 			}(array[i]);
-			devicehref.innerHTML = array[i].Name;
+			devicehref.innerHTML = htmlEncode(decodeURIComponent(array[i].Name));
 
 
 			editButton.appendChild(devicehref);
