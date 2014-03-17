@@ -196,8 +196,25 @@ function GetLocation(DeviceID)
 						{
 							// it's equal... do not add - just update the popup
 							addToMap = false; 
-							existingMarker.getPopup().setContent(deviceName).update();
-							existingMarker.openPopup();
+							if (followMarkerUpdates)
+							{
+								existingMarker.getPopup().setContent(deviceName).update();
+								existingMarker.openPopup();								
+							}
+							else
+							{
+								if(existingMarker._map.hasLayer(existingMarker._popup)) 
+								{
+									existingMarker.getPopup().setContent(deviceName).update();
+								}
+								else
+								{
+									existingMarker.getPopup()._content = deviceName;
+								}
+								
+							}
+							
+							
 						}		
 					}
 
@@ -216,7 +233,9 @@ function GetLocation(DeviceID)
 						newMarker.addTo(map).bindPopup(deviceName).openPopup();
 						
 						if (followMarkerUpdates)
+						{
 							map.panTo(new L.LatLng(data.MiataruLocation[0].Latitude,data.MiataruLocation[0].Longitude));
+						}							
 
 					}
 					

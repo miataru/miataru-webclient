@@ -101,7 +101,7 @@
       Example:
       <p>
       </span>
-	      <iframe width="558" scrolling="no" height="240" frameborder="0" src="http://miataru.com/client/embed.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device"></iframe>
+      	<div id="embediframeplaceholder"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -240,8 +240,26 @@
 
       
 <script>
+
 // make the search button work
 $(document).ready( function() {
+
+	// this is the iFrame handling for the embedding example. Sine we do not want to display it on page load we fill the div 
+	// when the modal is shown
+	$("#widgetModal").on('show.bs.modal', function(event){
+		console.log("Embed Modal showing");
+		
+		document.getElementById("embediframeplaceholder").innerHTML = '<iframe width="558" scrolling="no" height="240" frameborder="0" src="http://miataru.com/client/embed.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device"></iframe>';
+		
+	  });
+
+	// and clear it when it's hidden
+	$("#widgetModal").on('hide.bs.modal', function(event){
+		console.log("Embed Modal hidden");
+		
+		document.getElementById("embediframeplaceholder").innerHTML = '';
+		
+	  });
 
     /** Bind onclick event to search button **/
     $('#DeviceIDSearchButton').bind('click', function(){

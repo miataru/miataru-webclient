@@ -41,14 +41,35 @@ $(window).load(function(){
 	{
 		var Data = window.location.hash.slice( 1 ).split(";");
 	    
-	    console.log("User passed a device: "+ htmlEncode( decodeURIComponent( Data[0] ) ));
-	    console.log("User named a device:"+ htmlEncode( decodeURIComponent( Data[1] ) ) );
-	    AddKnownDevices(Data[0]);
-	    UpdateKnownDevices(Data[0],htmlEncode( decodeURIComponent( Data[1] ) ));
-		GetLocation(Data[0]);
+	    console.log("User passed a device: " + htmlEncode( decodeURIComponent( Data[0] ) ));
+	    console.log("User named a device:" + htmlEncode( decodeURIComponent( Data[1] ) ) );
+	    					
+	    var Device = {};
+			Device.Name = htmlEncode( decodeURIComponent( Data[1] ) );
+			Device.ID = htmlEncode( decodeURIComponent( Data[0] ) ) ;
+
+	    AddKnownDevices( Device );
+		GetLocation( htmlEncode( decodeURIComponent( Data[0] ) ) );
 	}
 });
 </script>
+
+<!-- Piwik Tracking Code -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(["setCookieDomain", "*.miataru.com"]);
+  _paq.push(["trackPageView"]);
+  _paq.push(["enableLinkTracking"]);
+
+  (function() {
+    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://schrankmonster.de/piwik/";
+    _paq.push(["setTrackerUrl", u+"piwik.php"]);
+    _paq.push(["setSiteId", "13"]);
+    var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
+    g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- Piwik Tracking Code -->
 
   </body>
 </html>
