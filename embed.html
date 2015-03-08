@@ -1,75 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="shortcut icon" href="images/favicon.png">
-
+<html>
+<head>
     <title>Miataru Embedded Location</title>
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <style>
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
 
-    <!-- LeafletJS core CSS -->
-    <link href="css/leaflet.css" rel="stylesheet">
-    
-    <!-- Custom styles for this template -->
-    <link href="index.css" rel="stylesheet">
-
-	<script src="js/jquery-1.10.2.min.js"></script>
-	<script src="js/leaflet.js"></script>
-	<script src="index.js"></script>
-	
-  </head>
-  
-  <body onLoad="javascript:init();">
-	  <div id="map">
-		  <div class="container">
-		   <div class="row">
-		      <div class="col-md-12">
-		      </div>
-		   </div>
-		  </div>
-      </div>
-      
-<script>
-
-
-$(window).load(function(){
-	// look if we got a hash parameter passed
-	if (window.location.hash != "")
-	{
-		var Data = window.location.hash.slice( 1 ).split(";");
-	    
-	    console.log("User passed a device: " + htmlEncode( decodeURIComponent( Data[0] ) ));
-	    console.log("User named a device:" + htmlEncode( decodeURIComponent( Data[1] ) ) );
-	    					
-	    var Device = {};
-			Device.Name = htmlEncode( decodeURIComponent( Data[1] ) );
-			Device.ID = htmlEncode( decodeURIComponent( Data[0] ) ) ;
-
-	    AddKnownDevices( Device );
-		GetLocation( htmlEncode( decodeURIComponent( Data[0] ) ) );
-	}
-});
-</script>
-
-<!-- Piwik Tracking Code -->
-<script type="text/javascript">
-  var _paq = _paq || [];
-  _paq.push(["setCookieDomain", "*.miataru.com"]);
-  _paq.push(["trackPageView"]);
-  _paq.push(["enableLinkTracking"]);
-
-  (function() {
-    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://schrankmonster.de/piwik/";
-    _paq.push(["setTrackerUrl", u+"piwik.php"]);
-    _paq.push(["setSiteId", "13"]);
-    var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-    g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- Piwik Tracking Code -->
-
-  </body>
+    <script src="js/leaflet.js"></script>
+    <script src="js/leaflet-realtime.min.js"></script>
+    <script src="js/jquery-1.10.2.min.js"></script>
+    <script src="embed.js"></script>
+        
+</body>
 </html>
