@@ -1,6 +1,6 @@
 # miataru-webclient
 
-This is the HTML5 Implementation of a Miataru Client Application. You can get more information [here](http://www.miataru.com).
+This is the HTML5 Implementation of a Miataru Client Application. You can get more information [here](http://miataru.com/client/#BF0160F5-4138-402C-A5F0-DEB1AA1F4216).
 
 ## What is Miataru?
 
