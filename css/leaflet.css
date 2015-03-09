@@ -124,16 +124,15 @@
 
 /* zoom and fade animations */
 
-.leaflet-fade-anim .leaflet-tile,
-.leaflet-fade-anim .leaflet-popup {
+.leaflet-fade-anim .leaflet-tile {
 	opacity: 0;
-	-webkit-transition: opacity 0.2s linear;
-	   -moz-transition: opacity 0.2s linear;
-	     -o-transition: opacity 0.2s linear;
-	        transition: opacity 0.2s linear;
+	-webkit-transition: opacity 0.1s linear;
+	   -moz-transition: opacity 0.1s linear;
+	     -o-transition: opacity 0.1s linear;
+	        transition: opacity 0.1s linear;
 	}
 .leaflet-fade-anim .leaflet-tile-loaded,
-.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+.leaflet-fade-anim .leaflet-map-pane {
 	opacity: 1;
 	}
 
