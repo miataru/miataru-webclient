@@ -19,6 +19,7 @@
         </select>
         <input type="text" id="searchInput" placeholder="Miataru DeviceID">
         <button id="searchButton">Search</button>
+        <button id="helpButton" class="help-button">?</button>
     </div>
     <div id="map"></div>
 
@@ -42,6 +43,33 @@
             <div class="modal-buttons">
                 <button id="confirmDeleteButton" class="delete-btn">Delete</button>
                 <button id="cancelDeleteButton">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content help-content">
+            <h3>About Miataru Web Client</h3>
+            <div class="help-text">
+                <p>This is a website client for the Miataru service. You can interact with the server side through this website.</p>
+                <p>To save known devices and quickly access them later your browser needs to support HTML5 Web Storage (Web storage is supported in Internet Explorer 8+, Firefox, Opera, Chrome, and Safari.)</p>
+                <p>It is not storing any data except in your local browser - it does access the internet and the Miataru service to retrieve location information for given DeviceIDs.</p>
+                
+                <div class="demo-section">
+                    <p>To see a Demo-Device click here: <a href="#BF0160F5-4138-402C-A5F0-DEB1AA1F4216" class="demo-link">Demo Device</a> or scan the Demo-Device QR Code:</p>
+                    <img src="img/qrcode.png" alt="Demo Device QR Code" class="qr-code">
+                </div>
+                
+                <div class="links-section">
+                    <p>Get more information here: <a href="https://miataru.com" target="_blank">miataru.com</a></p>
+                    <p>Get the sourcecode here: <a href="https://github.com/miataru" target="_blank">github</a></p>
+                </div>
+                
+                <p class="copyright">&copy; 2013-2014 Daniel Kirstenpfad / <a href="https://www.technology-ninja.com/" target="_blank">technology-ninja</a></p>
+            </div>
+            <div class="modal-buttons">
+                <button id="closeHelpButton">Close</button>
             </div>
         </div>
     </div>

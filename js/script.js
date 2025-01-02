@@ -384,4 +384,44 @@ document.addEventListener('keydown', (e) => {
         hideDeleteDeviceModal();
         hideSaveDeviceModal();
     }
+});
+
+// Help Modal Funktionen
+function showHelpModal() {
+    const modal = document.getElementById('helpModal');
+    modal.style.display = 'flex';
+}
+
+function hideHelpModal() {
+    const modal = document.getElementById('helpModal');
+    modal.style.display = 'none';
+}
+
+// Event Listener für Help Button
+document.getElementById('helpButton').addEventListener('click', showHelpModal);
+document.getElementById('closeHelpButton').addEventListener('click', hideHelpModal);
+
+// Klick außerhalb des Help-Modals schließt es
+document.getElementById('helpModal').addEventListener('click', (e) => {
+    if (e.target.id === 'helpModal') {
+        hideHelpModal();
+    }
+});
+
+// Escape-Taste schließt auch das Help-Modal
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        hideHelpModal();
+        hideDeleteDeviceModal();
+        hideSaveDeviceModal();
+    }
+});
+
+// Demo-Link Handler
+document.querySelector('.demo-link')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const demoDeviceId = 'BF0160F5-4138-402C-A5F0-DEB1AA1F4216';
+    document.getElementById('searchInput').value = demoDeviceId;
+    startTracking(demoDeviceId, false);
+    hideHelpModal();
 }); 

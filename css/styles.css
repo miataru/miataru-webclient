@@ -211,4 +211,71 @@ body {
 
 .auto-center-button.active:hover {
     background-color: #0056b3;
+}
+
+/* Help Button Style */
+.help-button {
+    padding: 8px 12px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.help-button:hover {
+    background-color: #545b62;
+}
+
+/* Help Modal Styles */
+.help-content {
+    max-width: 600px;
+    width: auto;
+}
+
+.help-text {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.demo-section {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.qr-code {
+    max-width: 200px;
+    margin: 15px auto;
+    display: block;
+}
+
+.links-section {
+    margin: 20px 0;
+}
+
+.links-section a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.links-section a:hover {
+    text-decoration: underline;
+}
+
+.copyright {
+    margin-top: 20px;
+    color: #666;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.demo-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.demo-link:hover {
+    text-decoration: underline;
 } 
