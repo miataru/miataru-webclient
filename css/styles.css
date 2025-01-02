@@ -140,7 +140,7 @@ body {
     margin-top: 10px;
 }
 
-.rename-btn, .save-device-btn {
+.rename-btn, .save-device-btn, .history-device {
     padding: 4px 8px;
     background-color: #007bff;
     color: white;
@@ -149,7 +149,7 @@ body {
     cursor: pointer;
 }
 
-.rename-btn:hover, .save-device-btn:hover {
+.rename-btn:hover, .save-device-btn:hover, .history-device:hover {
     background-color: #0056b3;
 }
 
@@ -368,4 +368,22 @@ body {
     display: block;
     margin: 0 auto;
     max-width: 100%;
+}
+
+.device-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.device-controls button {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.device-controls button:hover {
+    background: #f0f0f0;
 } 

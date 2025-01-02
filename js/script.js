@@ -238,10 +238,14 @@ function createPopupContent(deviceId, storedName, location) {
             <div class="popup-buttons">
                 <button onclick="showSaveDeviceModal('${deviceId}', '${storedName}')" class="rename-btn">Rename</button>
                 <button onclick="showDeleteDeviceModal('${deviceId}')" class="delete-btn">×</button>
+                <button class="history-device">History</button>
             </div>`;
     } else {
         actionButtons = `
-            <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Save Device</button>`;
+            <div class="popup-buttons">
+                <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Save Device</button>
+                <button class="history-device">History</button>
+            </div>`;
     }
     
     // Popup-Inhalt basierend auf Stil
@@ -249,6 +253,7 @@ function createPopupContent(deviceId, storedName, location) {
         return `
             <strong>${simpleName}</strong><br>
             ${getRelativeTimeString(timestamp)}
+            ${actionButtons}
         `;
     } else {
         return `
@@ -366,6 +371,25 @@ async function fetchDeviceLocation(deviceId) {
             
             const popupContent = createPopupContent(deviceId, storedName, location);
             currentMarker.bindPopup(popupContent);
+            
+            // Hier fügen wir die Device-Controls hinzu
+            const popup = currentMarker.getPopup();
+            popup.on('add', () => {
+                const container = popup.getElement();
+                if (container) {
+                    // Device-Controls initialisieren
+                    const deviceObj = {
+                        id: deviceId,
+                        stopTracking: () => {
+                            if (intervalId) clearInterval(intervalId);
+                        },
+                        startTracking: () => {
+                            startTracking(deviceId, false);
+                        }
+                    };
+                    initializeDeviceControls(deviceObj, container);
+                }
+            });
             
             if (autoCenterEnabled) {
                 currentMarker.openPopup();
@@ -649,4 +673,105 @@ document.addEventListener('keydown', (e) => {
         hideDeleteDeviceModal();
         hideSaveDeviceModal();
     }
-}); 
+});
+
+// Nach der Device-Klasse
+class DeviceHistory {
+    constructor(deviceId, map) {
+        this.deviceId = deviceId;
+        this.map = map;
+        this.historyMarkers = [];
+        this.isTracking = false;
+    }
+
+    async loadHistory() {
+        const payload = {
+            MiataruConfig: {
+                RequestMiataruDeviceID: "miataru-web-app"
+            },
+            MiataruGetLocationHistory: {
+                Device: this.deviceId,
+                Amount: "100"
+            }
+        };
+
+        try {
+            const response = await fetch('https://service.miataru.com/v1/GetLocationHistory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            const data = await response.json();
+            this.displayHistory(data.MiataruLocation);
+        } catch (error) {
+            console.error('Fehler beim Laden der Historie:', error);
+        }
+    }
+
+    displayHistory(locations) {
+        // Bestehende Marker entfernen
+        this.clearHistory();
+
+        // Zeitstempel sortieren für Farbberechnung
+        const timestamps = locations.map(loc => parseInt(loc.Timestamp));
+        const minTime = Math.min(...timestamps);
+        const maxTime = Math.max(...timestamps);
+        const timeRange = maxTime - minTime;
+
+        locations.forEach(location => {
+            // Farbberechnung (rot zu grün)
+            const timePosition = (parseInt(location.Timestamp) - minTime) / timeRange;
+            const color = this.getColorForPosition(timePosition);
+
+            const marker = L.circleMarker([location.Latitude, location.Longitude], {
+                radius: 5,
+                fillColor: color,
+                color: color,
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.8
+            });
+
+            marker.bindTooltip(`Zeitpunkt: ${new Date(parseInt(location.Timestamp)).toLocaleString()}`);
+            marker.addTo(this.map);
+            this.historyMarkers.push(marker);
+        });
+    }
+
+    getColorForPosition(position) {
+        // Rot (ältest) zu Grün (neust)
+        const red = Math.floor(255 * (1 - position));
+        const green = Math.floor(255 * position);
+        return `rgb(${red}, ${green}, 0)`;
+    }
+
+    clearHistory() {
+        this.historyMarkers.forEach(marker => marker.remove());
+        this.historyMarkers = [];
+    }
+}
+
+// Die initializeDeviceControls Funktion anpassen
+function initializeDeviceControls(device, container) {
+    const historyButton = container.querySelector('.history-device');
+    if (!historyButton) return;
+    
+    const deviceHistory = new DeviceHistory(device.id, map);
+    
+    historyButton.addEventListener('click', async () => {
+        if (!deviceHistory.isTracking) {
+            device.stopTracking(); // Temporäres Deaktivieren des Auto-Updates
+            await deviceHistory.loadHistory();
+            deviceHistory.isTracking = true;
+            historyButton.textContent = 'Hide History';
+        } else {
+            device.startTracking(); // Auto-Update wieder aktivieren
+            deviceHistory.clearHistory();
+            deviceHistory.isTracking = false;
+            historyButton.textContent = 'History';
+        }
+    });
+} 
