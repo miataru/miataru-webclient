@@ -34,6 +34,9 @@ const TOOLTIP_STYLE = {
 // Globale Variable für den Genauigkeitskreis
 let accuracyCircle = null;
 
+// Globale Variable für den History-Status
+let historyModeActive = false;
+
 // Funktion zum Laden der gespeicherten Devices
 function loadStoredDevices() {
     const stored = localStorage.getItem(STORED_DEVICES_KEY);
@@ -253,7 +256,6 @@ function createPopupContent(deviceId, storedName, location) {
         return `
             <strong>${simpleName}</strong><br>
             ${getRelativeTimeString(timestamp)}
-            ${actionButtons}
         `;
     } else {
         return `
@@ -488,6 +490,11 @@ updateDevicesDropdown();
 
 // Funktion zum Starten der Aktualisierung anpassen
 function startTracking(deviceId, isDefault = false) {
+    // Wenn History Mode aktiv ist, keine neue Aktualisierung starten
+    if (historyModeActive) {
+        return;
+    }
+
     // Bestehende Timer stoppen
     if (intervalId) clearInterval(intervalId);
     if (defaultIntervalId) clearInterval(defaultIntervalId);
@@ -716,14 +723,14 @@ class DeviceHistory {
         this.clearHistory();
 
         // Zeitstempel sortieren für Farbberechnung
-        const timestamps = locations.map(loc => parseInt(loc.Timestamp));
+        const timestamps = locations.map(loc => parseFloat(loc.Timestamp) * 1000);
         const minTime = Math.min(...timestamps);
         const maxTime = Math.max(...timestamps);
         const timeRange = maxTime - minTime;
 
         locations.forEach(location => {
             // Farbberechnung (rot zu grün)
-            const timePosition = (parseInt(location.Timestamp) - minTime) / timeRange;
+            const timePosition = ((parseFloat(location.Timestamp) * 1000) - minTime) / timeRange;
             const color = this.getColorForPosition(timePosition);
 
             const marker = L.circleMarker([location.Latitude, location.Longitude], {
@@ -735,7 +742,10 @@ class DeviceHistory {
                 fillOpacity: 0.8
             });
 
-            marker.bindTooltip(`Zeitpunkt: ${new Date(parseInt(location.Timestamp)).toLocaleString()}`);
+            // Timestamp-Parsing wie beim Device-Tooltip
+            const date = new Date(parseFloat(location.Timestamp) * 1000);
+            marker.bindTooltip(`Zeitpunkt: ${date.toLocaleString()}`);
+            
             marker.addTo(this.map);
             this.historyMarkers.push(marker);
         });
@@ -763,15 +773,21 @@ function initializeDeviceControls(device, container) {
     
     historyButton.addEventListener('click', async () => {
         if (!deviceHistory.isTracking) {
-            device.stopTracking(); // Temporäres Deaktivieren des Auto-Updates
+            historyModeActive = true;
+            if (intervalId) clearInterval(intervalId);
+            if (defaultIntervalId) clearInterval(defaultIntervalId);
+            
             await deviceHistory.loadHistory();
             deviceHistory.isTracking = true;
             historyButton.textContent = 'Hide History';
         } else {
-            device.startTracking(); // Auto-Update wieder aktivieren
+            historyModeActive = false;
             deviceHistory.clearHistory();
             deviceHistory.isTracking = false;
             historyButton.textContent = 'History';
+            
+            // Tracking neu starten
+            startTracking(device.id, false);
         }
     });
 } 
