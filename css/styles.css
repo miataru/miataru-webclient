@@ -184,4 +184,31 @@ body {
 
 #confirmDeleteButton:hover {
     background-color: #c82333;
+}
+
+/* Styles für den Auto-Center Toggle Button */
+.auto-center-button {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 30px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.auto-center-button.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.auto-center-button:hover {
+    background-color: #f4f4f4;
+}
+
+.auto-center-button.active:hover {
+    background-color: #0056b3;
 } 

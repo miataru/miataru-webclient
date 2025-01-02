@@ -12,6 +12,9 @@ let defaultIntervalId = null;  // Neuer Timer für Default Device
 let currentDeviceToSave = null;
 let deviceToDelete = null;
 
+// Neue globale Variable für den Auto-Center Status
+let autoCenterEnabled = true;
+
 // Konstanten
 const DEFAULT_DEVICE_ID = 'BF0160F5-4138-402C-A5F0-DEB1AA1F4216';
 
@@ -97,6 +100,41 @@ function getRelativeTimeString(timestamp) {
     }
 }
 
+// Funktion zum Erstellen und Hinzufügen des Auto-Center Buttons
+function addAutoCenterButton() {
+    // Erstelle einen benutzerdefinierten Leaflet Control
+    const AutoCenterControl = L.Control.extend({
+        options: {
+            position: 'topleft'
+        },
+
+        onAdd: function() {
+            const button = L.DomUtil.create('button', 'auto-center-button');
+            button.innerHTML = '🎯';
+            button.title = 'Toggle Auto-Center';
+            button.type = 'button';
+            
+            // Initial aktiv
+            button.classList.add('active');
+            
+            L.DomEvent.disableClickPropagation(button);
+            
+            button.addEventListener('click', () => {
+                autoCenterEnabled = !autoCenterEnabled;
+                button.classList.toggle('active');
+            });
+            
+            return button;
+        }
+    });
+
+    // Füge den Control zur Karte hinzu
+    map.addControl(new AutoCenterControl());
+}
+
+// Button nach der Karten-Initialisierung hinzufügen
+addAutoCenterButton();
+
 // Funktion zum Abrufen der Position
 async function fetchDeviceLocation(deviceId) {
     try {
@@ -161,11 +199,20 @@ async function fetchDeviceLocation(deviceId) {
                 ${actionButtons}
             `;
             
-            currentMarker.bindPopup(popupContent).openPopup();
+            // Popup mit Buttons erstellen
+            currentMarker.bindPopup(popupContent);
             
-            map.flyTo([latitude, longitude], 13, {
-                duration: 1.5
-            });
+            // Popup nur öffnen wenn Auto-Center aktiv ist
+            if (autoCenterEnabled) {
+                currentMarker.openPopup();
+            }
+            
+            // Nur zur Position zoomen wenn Auto-Center aktiviert ist
+            if (autoCenterEnabled) {
+                map.flyTo([latitude, longitude], 13, {
+                    duration: 1.5
+                });
+            }
         }
     } catch (error) {
         console.error('Fehler beim Abrufen der Position:', error);
