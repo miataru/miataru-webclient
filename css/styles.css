@@ -386,4 +386,42 @@ body {
 
 .device-controls button:hover {
     background: #f0f0f0;
+}
+
+/* Settings Button Style */
+.settings-button {
+    padding: 8px 12px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.settings-button:hover {
+    background-color: #545b62;
+}
+
+/* Settings Modal Styles */
+.settings-form {
+    margin-bottom: 20px;
+}
+
+.setting-group {
+    margin-bottom: 15px;
+}
+
+.setting-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.setting-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
 } 

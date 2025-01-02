@@ -40,6 +40,13 @@ let historyModeActive = false;
 // Globale Variable für die aktuelle DeviceHistory-Instanz
 let currentDeviceHistory = null;
 
+// Konstanten für Settings
+const SETTINGS_KEY = 'miataruSettings';
+const DEFAULT_SETTINGS = {
+    updateInterval: 5,    // in Sekunden
+    historyAmount: 100    // Anzahl der History-Einträge
+};
+
 // Funktion zum Laden der gespeicherten Devices
 function loadStoredDevices() {
     const stored = localStorage.getItem(STORED_DEVICES_KEY);
@@ -321,6 +328,9 @@ async function toggleHistory(deviceId, button) {
         await currentDeviceHistory.loadHistory();
         currentDeviceHistory.isTracking = true;
         button.textContent = 'Hide History';
+        
+        // Timestamp-Update weiterlaufen lassen
+        startTimestampUpdate();
     } else {
         // History deaktivieren
         historyModeActive = false;
@@ -333,6 +343,9 @@ async function toggleHistory(deviceId, button) {
         
         // Tracking neu starten
         startTracking(deviceId, false);
+        
+        // Timestamp-Update fortsetzen
+        startTimestampUpdate();
     }
 }
 
@@ -525,10 +538,13 @@ function startTracking(deviceId, isDefault = false) {
     // Sofort erste Abfrage durchführen
     fetchDeviceLocation(deviceId);
     
+    // Einstellungen laden
+    const settings = loadSettings();
+    
     // Timer für regelmäßige Aktualisierung setzen
     const newInterval = setInterval(() => {
         fetchDeviceLocation(deviceId);
-    }, 5000);
+    }, settings.updateInterval * 1000);
     
     // Timer im entsprechenden Intervall-Handler speichern
     if (isDefault) {
@@ -708,13 +724,14 @@ class DeviceHistory {
     }
 
     async loadHistory() {
+        const settings = loadSettings();
         const payload = {
             MiataruConfig: {
                 RequestMiataruDeviceID: "miataru-web-app"
             },
             MiataruGetLocationHistory: {
                 Device: this.deviceId,
-                Amount: "100"
+                Amount: settings.historyAmount.toString()
             }
         };
 
@@ -778,4 +795,111 @@ class DeviceHistory {
         this.historyMarkers.forEach(marker => marker.remove());
         this.historyMarkers = [];
     }
-} 
+}
+
+// Globale Variable für den Timestamp-Update-Timer
+let timestampUpdateInterval = null;
+
+// Funktion zum Starten des Timestamp-Updates
+function startTimestampUpdate() {
+    // Bestehenden Timer stoppen falls vorhanden
+    if (timestampUpdateInterval) {
+        clearInterval(timestampUpdateInterval);
+    }
+    
+    // Neuen Timer starten
+    timestampUpdateInterval = setInterval(updateRelativeTime, 1000);
+}
+
+// Funktion zum Stoppen des Timestamp-Updates
+function stopTimestampUpdate() {
+    if (timestampUpdateInterval) {
+        clearInterval(timestampUpdateInterval);
+        timestampUpdateInterval = null;
+    }
+}
+
+// Aktualisieren der relativen Zeit unabhängig vom Tracking-Status
+function updateRelativeTime() {
+    if (currentMarker && currentLocation) {
+        const timestamp = new Date(parseFloat(currentLocation.Timestamp) * 1000);
+        const popupContent = createPopupContent(currentDeviceId, currentDeviceName, currentLocation);
+        currentMarker.getPopup().setContent(popupContent);
+        
+        // Popup neu öffnen, wenn es bereits offen war
+        if (currentMarker.isPopupOpen()) {
+            currentMarker.openPopup();
+        }
+    }
+}
+
+// Funktion zum Laden der Settings
+function loadSettings() {
+    const stored = localStorage.getItem(SETTINGS_KEY);
+    return stored ? JSON.parse(stored) : DEFAULT_SETTINGS;
+}
+
+// Funktion zum Speichern der Settings
+function saveSettings(settings) {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+// Settings Modal Funktionen
+function showSettingsModal() {
+    const modal = document.getElementById('settingsModal');
+    const settings = loadSettings();
+    
+    // Aktuelle Werte in Inputs setzen
+    document.getElementById('updateInterval').value = settings.updateInterval;
+    document.getElementById('historyAmount').value = settings.historyAmount;
+    
+    modal.style.display = 'flex';
+}
+
+function hideSettingsModal() {
+    const modal = document.getElementById('settingsModal');
+    modal.style.display = 'none';
+}
+
+// Event Listener für Settings
+document.getElementById('settingsButton').addEventListener('click', showSettingsModal);
+document.getElementById('closeSettingsButton').addEventListener('click', hideSettingsModal);
+
+// Settings speichern
+document.getElementById('saveSettingsButton').addEventListener('click', () => {
+    const updateInterval = parseInt(document.getElementById('updateInterval').value);
+    const historyAmount = parseInt(document.getElementById('historyAmount').value);
+    
+    // Validierung
+    if (updateInterval < 1 || updateInterval > 60) {
+        alert('Das Update-Intervall muss zwischen 1 und 60 Sekunden liegen.');
+        return;
+    }
+    if (historyAmount < 10 || historyAmount > 1000) {
+        alert('Die Anzahl der History-Einträge muss zwischen 10 und 1000 liegen.');
+        return;
+    }
+    
+    // Settings speichern
+    saveSettings({
+        updateInterval,
+        historyAmount
+    });
+    
+    // Aktuelles Tracking neu starten mit neuem Interval
+    if (currentDeviceId) {
+        startTracking(currentDeviceId, currentDeviceId === DEFAULT_DEVICE_ID);
+    }
+    
+    hideSettingsModal();
+});
+
+// Klick außerhalb des Settings-Modals schließt es
+document.getElementById('settingsModal').addEventListener('click', (e) => {
+    if (e.target.id === 'settingsModal') {
+        hideSettingsModal();
+    }
+});
+
+// Initialisierung: Timestamp-Update starten
+startTimestampUpdate(); 

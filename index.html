@@ -21,6 +21,7 @@
         <button id="searchButton">Search</button>
         <button id="helpButton" class="help-button">?</button>
         <button id="embedButton" class="embed-button">< ></button>
+        <button id="settingsButton" class="settings-button">⚙️</button>
     </div>
     <div id="map"></div>
 
@@ -98,6 +99,27 @@
             </div>
             <div class="modal-buttons">
                 <button id="closeEmbedButton">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h3>Einstellungen</h3>
+            <div class="settings-form">
+                <div class="setting-group">
+                    <label for="updateInterval">Update-Intervall (Sekunden):</label>
+                    <input type="number" id="updateInterval" min="1" max="60" value="5">
+                </div>
+                <div class="setting-group">
+                    <label for="historyAmount">Anzahl der History-Einträge (10-1000):</label>
+                    <input type="number" id="historyAmount" min="10" max="1000" value="100">
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="saveSettingsButton">Speichern</button>
+                <button id="closeSettingsButton">Abbrechen</button>
             </div>
         </div>
     </div>
