@@ -149,17 +149,39 @@ function addAutoCenterButton() {
 addAutoCenterButton();
 addTooltipStyleControl();  // Tooltip Style Control hinzufügen
 
-// Funktion zum Laden des Tooltip-Stils
+// Funktion zum Laden des Tooltip-Stils anpassen
 function getTooltipStyle() {
-    return localStorage.getItem(TOOLTIP_STYLE_KEY) || TOOLTIP_STYLE.FULL;
+    // Primär aus URL lesen
+    const { style } = getUrlParameters();
+    // Nur wenn kein Stil in der URL ist, aus localStorage lesen
+    return style || localStorage.getItem(TOOLTIP_STYLE_KEY) || TOOLTIP_STYLE.FULL;
 }
 
-// Funktion zum Speichern des Tooltip-Stils
+// Funktion zum Speichern des Tooltip-Stils anpassen
 function setTooltipStyle(style) {
     localStorage.setItem(TOOLTIP_STYLE_KEY, style);
+    // Aktuellen Device-ID holen und URL aktualisieren
+    const { deviceId } = getUrlParameters();
+    setUrlParameters(deviceId, style);
 }
 
-// Tooltip Control für die Karte
+// Funktion zum Setzen der Parameter in der URL
+function setUrlParameters(deviceId, style) {
+    const currentStyle = style || getTooltipStyle();
+    window.location.hash = `${deviceId}${currentStyle === TOOLTIP_STYLE.SIMPLE ? '?simple' : ''}`;
+}
+
+// Funktion zum Lesen der Parameter aus der URL
+function getUrlParameters() {
+    const hash = window.location.hash.slice(1);
+    const [devicePart, stylePart] = hash.split('?');
+    return {
+        deviceId: devicePart || DEFAULT_DEVICE_ID,
+        style: stylePart === 'simple' ? TOOLTIP_STYLE.SIMPLE : TOOLTIP_STYLE.FULL
+    };
+}
+
+// Tooltip Control anpassen
 function addTooltipStyleControl() {
     const TooltipControl = L.Control.extend({
         options: {
@@ -173,7 +195,8 @@ function addTooltipStyleControl() {
             button.type = 'button';
             
             // Initial Style setzen
-            if (getTooltipStyle() === TOOLTIP_STYLE.SIMPLE) {
+            const currentStyle = getTooltipStyle();
+            if (currentStyle === TOOLTIP_STYLE.SIMPLE) {
                 button.classList.add('simple');
             }
             
@@ -185,7 +208,7 @@ function addTooltipStyleControl() {
                 setTooltipStyle(newStyle);
                 button.classList.toggle('simple');
                 
-                // Aktuellen Marker aktualisieren, falls vorhanden
+                // Aktuellen Marker aktualisieren
                 if (currentMarker) {
                     currentMarker.getPopup().setContent(createPopupContent(
                         currentDeviceId,
@@ -439,24 +462,15 @@ document.getElementById('savedDevices').addEventListener('change', (e) => {
 // Initial die gespeicherten Devices laden
 updateDevicesDropdown();
 
-// Funktion zum Setzen der DeviceID in der URL
-function setDeviceIdInUrl(deviceId) {
-    window.location.hash = deviceId;
-}
-
-// Funktion zum Lesen der DeviceID aus der URL
-function getDeviceIdFromUrl() {
-    return window.location.hash.slice(1) || DEFAULT_DEVICE_ID;
-}
-
 // Funktion zum Starten der Aktualisierung anpassen
 function startTracking(deviceId, isDefault = false) {
     // Bestehende Timer stoppen
     if (intervalId) clearInterval(intervalId);
     if (defaultIntervalId) clearInterval(defaultIntervalId);
     
-    // DeviceID in URL setzen
-    setDeviceIdInUrl(deviceId);
+    // DeviceID und aktuellen Stil in URL setzen
+    const currentStyle = getTooltipStyle();
+    setUrlParameters(deviceId, currentStyle);
     
     // Bei neuem Device den Zoom-Status zurücksetzen
     userHasZoomed = false;
@@ -479,17 +493,20 @@ function startTracking(deviceId, isDefault = false) {
 
 // Event-Listener für URL-Änderungen
 window.addEventListener('hashchange', () => {
-    const deviceId = getDeviceIdFromUrl();
+    const { deviceId, style } = getUrlParameters();
     document.getElementById('searchInput').value = deviceId;
+    setTooltipStyle(style);
+    document.querySelector('.tooltip-style-button')?.classList.toggle('simple', style === TOOLTIP_STYLE.SIMPLE);
     startTracking(deviceId, deviceId === DEFAULT_DEVICE_ID);
 });
 
-// Initialisierung anpassen - URL-Parameter berücksichtigen
-const initialDeviceId = getDeviceIdFromUrl();
-if (initialDeviceId !== DEFAULT_DEVICE_ID) {
-    document.getElementById('searchInput').value = initialDeviceId;
+// Initialisierung anpassen
+const { deviceId, style } = getUrlParameters();
+if (deviceId !== DEFAULT_DEVICE_ID) {
+    document.getElementById('searchInput').value = deviceId;
 }
-startTracking(initialDeviceId, initialDeviceId === DEFAULT_DEVICE_ID);
+setTooltipStyle(style);
+startTracking(deviceId, deviceId === DEFAULT_DEVICE_ID);
 
 // Event-Listener für den Such-Button
 document.getElementById('searchButton').addEventListener('click', () => {
