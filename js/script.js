@@ -74,6 +74,11 @@ async function fetchDeviceLocation(deviceId) {
             const latitude = coordinates[1];
             const name = data.properties?.name || deviceId;
             
+            // Gespeicherten Namen abrufen, falls vorhanden
+            const storedDevices = loadStoredDevices();
+            const storedName = storedDevices[deviceId];
+            const displayName = storedName ? `${storedName} (${deviceId})` : deviceId;
+            
             if (currentMarker) {
                 map.removeLayer(currentMarker);
             }
@@ -81,13 +86,13 @@ async function fetchDeviceLocation(deviceId) {
             // Marker mit erweitertem Popup erstellen
             currentMarker = L.marker([latitude, longitude], {
                 icon: pinIcon,
-                title: name
+                title: displayName  // Zeigt gespeicherten Namen + DeviceID im Tooltip
             });
             currentMarker.addTo(map);
             
             // Erweitertes Popup mit Speichern-Button
             const popupContent = `
-                <strong>DeviceID:</strong> ${name}<br>
+                <strong>DeviceID:</strong> ${displayName}<br>
                 <strong>Koordinaten:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}<br>
                 <strong>Letzte Aktualisierung:</strong> ${new Date().toLocaleTimeString()}<br>
                 <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Device speichern</button>
