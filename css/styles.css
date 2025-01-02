@@ -14,6 +14,17 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.toolbar-logo {
+    width: 29px;
+    height: 29px;
+    vertical-align: middle;
+}
+
+.toolbar a {
+    display: flex;
+    align-items: center;
+}
+
 #searchInput {
     flex-grow: 1;
     padding: 8px;
