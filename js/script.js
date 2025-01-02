@@ -250,6 +250,29 @@ map.on('zoomend', (e) => {
     }
 });
 
+// Funktion zum Vergleichen von Locations (ohne Timestamp)
+function hasLocationChanged(oldLocation, newLocation) {
+    if (!oldLocation || !newLocation) return true;
+    
+    return oldLocation.Latitude !== newLocation.Latitude ||
+           oldLocation.Longitude !== newLocation.Longitude ||
+           oldLocation.HorizontalAccuracy !== newLocation.HorizontalAccuracy;
+}
+
+// Funktion zum Aktualisieren der relativen Zeit im Popup
+function updateRelativeTime() {
+    if (currentMarker && currentLocation) {
+        const timestamp = new Date(parseFloat(currentLocation.Timestamp) * 1000);
+        const popupContent = createPopupContent(currentDeviceId, currentDeviceName, currentLocation);
+        currentMarker.getPopup().setContent(popupContent);
+        
+        // Popup neu öffnen wenn es bereits offen war
+        if (currentMarker.isPopupOpen()) {
+            currentMarker.openPopup();
+        }
+    }
+}
+
 // Funktion zum Abrufen der Position anpassen
 async function fetchDeviceLocation(deviceId) {
     try {
@@ -273,6 +296,16 @@ async function fetchDeviceLocation(deviceId) {
             const location = data.MiataruLocation[0];
             const storedDevices = loadStoredDevices();
             const storedName = storedDevices[deviceId];
+            
+            // Prüfen ob sich nur die Zeit geändert hat
+            if (!hasLocationChanged(currentLocation, location) && 
+                currentDeviceId === deviceId && 
+                currentDeviceName === storedName) {
+                // Nur die relative Zeit aktualisieren
+                currentLocation = location;  // Timestamp aktualisieren
+                updateRelativeTime();
+                return;
+            }
             
             // Aktuelle Informationen speichern
             currentDeviceId = deviceId;
