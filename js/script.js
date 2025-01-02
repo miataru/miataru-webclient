@@ -164,10 +164,9 @@ addTooltipStyleControl();  // Tooltip Style Control hinzufügen
 
 // Funktion zum Laden des Tooltip-Stils anpassen
 function getTooltipStyle() {
-    // Primär aus URL lesen
-    const { style } = getUrlParameters();
-    // Nur wenn kein Stil in der URL ist, aus localStorage lesen
-    return style || localStorage.getItem(TOOLTIP_STYLE_KEY) || TOOLTIP_STYLE.FULL;
+    const stored = localStorage.getItem(TOOLTIP_STYLE_KEY);
+    // Standardmäßig SIMPLE statt FULL zurückgeben
+    return stored || TOOLTIP_STYLE.SIMPLE;
 }
 
 // Funktion zum Speichern des Tooltip-Stils anpassen
@@ -207,11 +206,8 @@ function addTooltipStyleControl() {
             button.title = 'Toggle Tooltip Style';
             button.type = 'button';
             
-            // Initial Style setzen
-            const currentStyle = getTooltipStyle();
-            if (currentStyle === TOOLTIP_STYLE.SIMPLE) {
-                button.classList.add('simple');
-            }
+            // Initial Style setzen - Button sollte standardmäßig simple sein
+            button.classList.add('simple');
             
             L.DomEvent.disableClickPropagation(button);
             
