@@ -8,6 +8,10 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 let currentMarker = null;
 let intervalId = null;
+let defaultIntervalId = null;  // Neuer Timer für Default Device
+
+// Konstanten
+const DEFAULT_DEVICE_ID = 'BF0160F5-4138-402C-A5F0-DEB1AA1F4216';
 
 // Funktion zum Abrufen der Position
 async function fetchDeviceLocation(deviceId) {
@@ -69,24 +73,40 @@ async function fetchDeviceLocation(deviceId) {
     }
 }
 
+// Funktion zum Starten der Aktualisierung
+function startTracking(deviceId, isDefault = false) {
+    // Bestehende Timer stoppen
+    if (intervalId) clearInterval(intervalId);
+    if (defaultIntervalId) clearInterval(defaultIntervalId);
+    
+    // Sofort erste Abfrage durchführen
+    fetchDeviceLocation(deviceId);
+    
+    // Timer für regelmäßige Aktualisierung setzen
+    const newInterval = setInterval(() => {
+        fetchDeviceLocation(deviceId);
+    }, 5000);
+    
+    // Timer im entsprechenden Intervall-Handler speichern
+    if (isDefault) {
+        defaultIntervalId = newInterval;
+    } else {
+        intervalId = newInterval;
+    }
+}
+
 // Event-Listener für den Such-Button
 document.getElementById('searchButton').addEventListener('click', () => {
-    const deviceId = document.getElementById('searchInput').value.trim();
+    const inputDeviceId = document.getElementById('searchInput').value.trim();
     
-    // Bestehenden Timer stoppen, falls vorhanden
-    if (intervalId) {
-        clearInterval(intervalId);
-    }
-    
-    if (deviceId) {
-        // Sofort erste Abfrage durchführen
-        fetchDeviceLocation(deviceId);
-        
-        // Dann alle 5 Sekunden aktualisieren
-        intervalId = setInterval(() => {
-            fetchDeviceLocation(deviceId);
-        }, 5000); // 5 Sekunden Intervall
+    if (inputDeviceId) {
+        // Wenn eine DeviceID eingegeben wurde, nur diese tracken
+        startTracking(inputDeviceId, false);
     } else {
-        alert('Bitte geben Sie eine DeviceID ein');
+        // Wenn keine DeviceID eingegeben wurde, zurück zum Default
+        startTracking(DEFAULT_DEVICE_ID, true);
     }
-}); 
+});
+
+// Initial die Default-DeviceID laden und tracken
+startTracking(DEFAULT_DEVICE_ID, true); 
