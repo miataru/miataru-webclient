@@ -21,6 +21,13 @@ const DEFAULT_DEVICE_ID = 'BF0160F5-4138-402C-A5F0-DEB1AA1F4216';
 // Konstanten und Hilfsfunktionen für Device-Management
 const STORED_DEVICES_KEY = 'miataruDevices';
 
+// Konstanten für Tooltip-Stile
+const TOOLTIP_STYLE_KEY = 'miataruTooltipStyle';
+const TOOLTIP_STYLE = {
+    SIMPLE: 'simple',
+    FULL: 'full'
+};
+
 // Funktion zum Laden der gespeicherten Devices
 function loadStoredDevices() {
     const stored = localStorage.getItem(STORED_DEVICES_KEY);
@@ -134,11 +141,105 @@ function addAutoCenterButton() {
 
 // Button nach der Karten-Initialisierung hinzufügen
 addAutoCenterButton();
+addTooltipStyleControl();  // Tooltip Style Control hinzufügen
 
-// Funktion zum Abrufen der Position
+// Funktion zum Laden des Tooltip-Stils
+function getTooltipStyle() {
+    return localStorage.getItem(TOOLTIP_STYLE_KEY) || TOOLTIP_STYLE.FULL;
+}
+
+// Funktion zum Speichern des Tooltip-Stils
+function setTooltipStyle(style) {
+    localStorage.setItem(TOOLTIP_STYLE_KEY, style);
+}
+
+// Tooltip Control für die Karte
+function addTooltipStyleControl() {
+    const TooltipControl = L.Control.extend({
+        options: {
+            position: 'topleft'
+        },
+
+        onAdd: function() {
+            const button = L.DomUtil.create('button', 'tooltip-style-button');
+            button.innerHTML = '💬';
+            button.title = 'Toggle Tooltip Style';
+            button.type = 'button';
+            
+            // Initial Style setzen
+            if (getTooltipStyle() === TOOLTIP_STYLE.SIMPLE) {
+                button.classList.add('simple');
+            }
+            
+            L.DomEvent.disableClickPropagation(button);
+            
+            button.addEventListener('click', () => {
+                const currentStyle = getTooltipStyle();
+                const newStyle = currentStyle === TOOLTIP_STYLE.FULL ? TOOLTIP_STYLE.SIMPLE : TOOLTIP_STYLE.FULL;
+                setTooltipStyle(newStyle);
+                button.classList.toggle('simple');
+                
+                // Aktuellen Marker aktualisieren, falls vorhanden
+                if (currentMarker) {
+                    currentMarker.getPopup().setContent(createPopupContent(
+                        currentDeviceId,
+                        currentDeviceName,
+                        currentLocation
+                    ));
+                }
+            });
+            
+            return button;
+        }
+    });
+
+    map.addControl(new TooltipControl());
+}
+
+// Funktion zum Erstellen des Popup-Inhalts
+function createPopupContent(deviceId, storedName, location) {
+    const displayName = storedName ? `${storedName} (${deviceId})` : deviceId;
+    const simpleName = storedName || deviceId;  // Nur Name oder ID für Simple-Modus
+    const timestamp = new Date(parseFloat(location.Timestamp) * 1000);
+    
+    // Buttons basierend auf Speicherstatus
+    let actionButtons;
+    if (storedName) {
+        actionButtons = `
+            <div class="popup-buttons">
+                <button onclick="showSaveDeviceModal('${deviceId}', '${storedName}')" class="rename-btn">Rename</button>
+                <button onclick="showDeleteDeviceModal('${deviceId}')" class="delete-btn">×</button>
+            </div>`;
+    } else {
+        actionButtons = `
+            <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Save Device</button>`;
+    }
+    
+    // Popup-Inhalt basierend auf Stil
+    if (getTooltipStyle() === TOOLTIP_STYLE.SIMPLE) {
+        return `
+            <strong>${simpleName}</strong><br>
+            ${getRelativeTimeString(timestamp)}
+        `;
+    } else {
+        return `
+            <strong>DeviceID:</strong> ${displayName}<br>
+            <strong>Coordinates:</strong> ${parseFloat(location.Latitude).toFixed(6)}, ${parseFloat(location.Longitude).toFixed(6)}<br>
+            <strong>Accuracy:</strong> ${parseFloat(location.HorizontalAccuracy).toFixed(1)}m<br>
+            <strong>Last Update:</strong> ${getRelativeTimeString(timestamp)} (${timestamp.toLocaleString()})<br>
+            ${actionButtons}
+        `;
+    }
+}
+
+// Globale Variablen für aktuelle Marker-Informationen
+let currentDeviceId = null;
+let currentDeviceName = null;
+let currentLocation = null;
+
+// Funktion zum Abrufen der Position anpassen
 async function fetchDeviceLocation(deviceId) {
     try {
-        // POST Request mit Device ID
         const response = await fetch('https://service.miataru.com/v1/GetLocation', {
             method: 'POST',
             headers: {
@@ -157,65 +258,40 @@ async function fetchDeviceLocation(deviceId) {
         
         if (data && data.MiataruLocation && data.MiataruLocation[0]) {
             const location = data.MiataruLocation[0];
-            const longitude = parseFloat(location.Longitude);
-            const latitude = parseFloat(location.Latitude);
-            const timestamp = new Date(parseFloat(location.Timestamp) * 1000);
-            
-            // Gespeicherten Namen abrufen, falls vorhanden
             const storedDevices = loadStoredDevices();
             const storedName = storedDevices[deviceId];
-            const displayName = storedName ? `${storedName} (${deviceId})` : deviceId;
+            
+            // Aktuelle Informationen speichern
+            currentDeviceId = deviceId;
+            currentDeviceName = storedName;
+            currentLocation = location;
             
             if (currentMarker) {
                 map.removeLayer(currentMarker);
             }
             
-            // Marker mit erweitertem Popup erstellen
-            currentMarker = L.marker([latitude, longitude], {
+            currentMarker = L.marker([
+                parseFloat(location.Latitude),
+                parseFloat(location.Longitude)
+            ], {
                 icon: pinIcon,
-                title: displayName
+                title: storedName || deviceId
             });
+            
             currentMarker.addTo(map);
             
-            // Buttons basierend auf Speicherstatus
-            let actionButtons;
-            if (storedName) {
-                actionButtons = `
-                    <div class="popup-buttons">
-                        <button onclick="showSaveDeviceModal('${deviceId}', '${storedName}')" class="rename-btn">Rename</button>
-                        <button onclick="showDeleteDeviceModal('${deviceId}')" class="delete-btn">×</button>
-                    </div>`;
-            } else {
-                actionButtons = `
-                    <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Save Device</button>`;
-            }
-            
-            // Erweitertes Popup mit dynamischen Buttons
-            const popupContent = `
-                <strong>DeviceID:</strong> ${displayName}<br>
-                <strong>Coordinates:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}<br>
-                <strong>Accuracy:</strong> ${parseFloat(location.HorizontalAccuracy).toFixed(1)}m<br>
-                <strong>Last Update:</strong> ${getRelativeTimeString(timestamp)} (${timestamp.toLocaleString()})<br>
-                ${actionButtons}
-            `;
-            
-            // Popup mit Buttons erstellen
+            const popupContent = createPopupContent(deviceId, storedName, location);
             currentMarker.bindPopup(popupContent);
             
-            // Popup nur öffnen wenn Auto-Center aktiv ist
             if (autoCenterEnabled) {
                 currentMarker.openPopup();
-            }
-            
-            // Nur zur Position zoomen wenn Auto-Center aktiviert ist
-            if (autoCenterEnabled) {
-                map.flyTo([latitude, longitude], 13, {
+                map.flyTo([parseFloat(location.Latitude), parseFloat(location.Longitude)], 13, {
                     duration: 1.5
                 });
             }
         }
     } catch (error) {
-        console.error('Fehler beim Abrufen der Position:', error);
+        console.error('Error fetching position:', error);
     }
 }
 

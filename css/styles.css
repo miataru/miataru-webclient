@@ -278,4 +278,31 @@ body {
 
 .demo-link:hover {
     text-decoration: underline;
+}
+
+/* Tooltip Style Button */
+.tooltip-style-button {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 30px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.tooltip-style-button.simple {
+    background-color: #6c757d;
+    color: white;
+}
+
+.tooltip-style-button:hover {
+    background-color: #f4f4f4;
+}
+
+.tooltip-style-button.simple:hover {
+    background-color: #545b62;
 } 
