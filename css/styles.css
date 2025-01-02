@@ -56,4 +56,12 @@ body {
     #map {
         height: 100vh;
     }
+}
+
+#savedDevices {
+    min-width: 200px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
 } 

@@ -13,6 +13,40 @@ let defaultIntervalId = null;  // Neuer Timer für Default Device
 // Konstanten
 const DEFAULT_DEVICE_ID = 'BF0160F5-4138-402C-A5F0-DEB1AA1F4216';
 
+// Konstanten und Hilfsfunktionen für Device-Management
+const STORED_DEVICES_KEY = 'miataruDevices';
+
+// Funktion zum Laden der gespeicherten Devices
+function loadStoredDevices() {
+    const stored = localStorage.getItem(STORED_DEVICES_KEY);
+    return stored ? JSON.parse(stored) : {};
+}
+
+// Funktion zum Speichern eines Devices
+function saveDevice(deviceId, name) {
+    const devices = loadStoredDevices();
+    devices[deviceId] = name;
+    localStorage.setItem(STORED_DEVICES_KEY, JSON.stringify(devices));
+    updateDevicesDropdown();
+}
+
+// Funktion zum Aktualisieren des Dropdowns
+function updateDevicesDropdown() {
+    const select = document.getElementById('savedDevices');
+    const devices = loadStoredDevices();
+    
+    // Dropdown leeren bis auf den ersten Eintrag
+    while (select.options.length > 1) {
+        select.remove(1);
+    }
+    
+    // Gespeicherte Devices hinzufügen
+    Object.entries(devices).forEach(([deviceId, name]) => {
+        const option = new Option(`${name} (${deviceId})`, deviceId);
+        select.add(option);
+    });
+}
+
 // Benutzerdefiniertes Pin-Icon erstellen
 const pinIcon = L.divIcon({
     className: 'custom-pin',
@@ -39,40 +73,55 @@ async function fetchDeviceLocation(deviceId) {
             const latitude = coordinates[1];
             const name = data.properties?.name || deviceId;
             
-            console.log('Position erhalten:', latitude, longitude);
-            
-            // Bestehenden Marker entfernen, falls vorhanden
             if (currentMarker) {
                 map.removeLayer(currentMarker);
             }
             
-            // Marker mit benutzerdefiniertem Pin-Icon erstellen
+            // Marker mit erweitertem Popup erstellen
             currentMarker = L.marker([latitude, longitude], {
                 icon: pinIcon,
-                title: name  // Zeigt Namen beim Hover über den Pin
+                title: name
             });
             currentMarker.addTo(map);
             
-            // Popup mit zusätzlichen Informationen
-            currentMarker.bindPopup(`
+            // Erweitertes Popup mit Speichern-Button
+            const popupContent = `
                 <strong>DeviceID:</strong> ${name}<br>
                 <strong>Koordinaten:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}<br>
-                <strong>Letzte Aktualisierung:</strong> ${new Date().toLocaleTimeString()}
-            `).openPopup();
+                <strong>Letzte Aktualisierung:</strong> ${new Date().toLocaleTimeString()}<br>
+                <button onclick="saveCurrentDevice('${deviceId}')" class="save-device-btn">Device speichern</button>
+            `;
             
-            // Karte auf neue Position zentrieren mit Animation
+            currentMarker.bindPopup(popupContent).openPopup();
+            
             map.flyTo([latitude, longitude], 13, {
                 duration: 1.5
             });
-            
-            console.log('Marker gesetzt und Karte zentriert');
-        } else {
-            console.log('Keine gültigen Daten in der GeoJSON-Antwort');
         }
     } catch (error) {
         console.error('Fehler beim Abrufen der Position:', error);
     }
 }
+
+// Funktion zum Speichern des aktuellen Devices
+window.saveCurrentDevice = function(deviceId) {
+    const name = prompt('Unter welchem Namen soll das Device gespeichert werden?');
+    if (name) {
+        saveDevice(deviceId, name);
+    }
+};
+
+// Event-Listener für das Dropdown
+document.getElementById('savedDevices').addEventListener('change', (e) => {
+    const selectedDeviceId = e.target.value;
+    if (selectedDeviceId) {
+        document.getElementById('searchInput').value = selectedDeviceId;
+        startTracking(selectedDeviceId, false);
+    }
+});
+
+// Initial die gespeicherten Devices laden
+updateDevicesDropdown();
 
 // Funktion zum Starten der Aktualisierung
 function startTracking(deviceId, isDefault = false) {
