@@ -581,4 +581,55 @@ document.querySelector('.demo-link')?.addEventListener('click', (e) => {
     document.getElementById('searchInput').value = demoDeviceId;
     startTracking(demoDeviceId, false);
     hideHelpModal();
+});
+
+// Embed Modal Funktionen
+function showEmbedModal() {
+    const modal = document.getElementById('embedModal');
+    modal.style.display = 'flex';
+}
+
+function hideEmbedModal() {
+    const modal = document.getElementById('embedModal');
+    modal.style.display = 'none';
+}
+
+// Copy-Funktion für den Embed-Code
+function copyEmbedCode() {
+    const codeElement = document.querySelector('.code-block code');
+    const textArea = document.createElement('textarea');
+    textArea.value = codeElement.textContent;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    
+    // Visuelles Feedback
+    const copyButton = document.querySelector('.copy-button');
+    const originalText = copyButton.textContent;
+    copyButton.textContent = 'Copied!';
+    setTimeout(() => {
+        copyButton.textContent = originalText;
+    }, 2000);
+}
+
+// Event Listener für Embed Button
+document.getElementById('embedButton').addEventListener('click', showEmbedModal);
+document.getElementById('closeEmbedButton').addEventListener('click', hideEmbedModal);
+
+// Klick außerhalb des Embed-Modals schließt es
+document.getElementById('embedModal').addEventListener('click', (e) => {
+    if (e.target.id === 'embedModal') {
+        hideEmbedModal();
+    }
+});
+
+// Escape-Taste schließt auch das Embed-Modal
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        hideEmbedModal();
+        hideHelpModal();
+        hideDeleteDeviceModal();
+        hideSaveDeviceModal();
+    }
 }); 

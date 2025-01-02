@@ -20,6 +20,7 @@
         <input type="text" id="searchInput" placeholder="Miataru DeviceID">
         <button id="searchButton">Search</button>
         <button id="helpButton" class="help-button">?</button>
+        <button id="embedButton" class="embed-button">< ></button>
     </div>
     <div id="map"></div>
 
@@ -70,6 +71,33 @@
             </div>
             <div class="modal-buttons">
                 <button id="closeHelpButton">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Embed Modal -->
+    <div id="embedModal" class="modal">
+        <div class="modal-content help-content">
+            <h3>Embed a device into your own website</h3>
+            <div class="help-text">
+                <p>You can embed a device into a website by adding the following pattern to your website's HTML:</p>
+                
+                <div class="code-block">
+                    <pre><code>&lt;iframe width="320" scrolling="no" height="240" frameborder="0" 
+    src="https://miataru.com/client/index.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device"&gt;&lt;/iframe&gt;</code></pre>
+                    <button class="copy-button" onclick="copyEmbedCode()">Copy</button>
+                </div>
+                
+                <p>You have to change the above code snippet to contain the DeviceID (BF01...) and the Device Name (separated after the DeviceID with a ;). You can display multiple devices on one map by separating them further with BF01...;Name;BF02;Name2 and so on...</p>
+                
+                <p>Example:</p>
+                <div class="embed-example">
+                    <iframe width="320" scrolling="no" height="240" frameborder="0" 
+                        src="https://miataru.com/client/index.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device"></iframe>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="closeEmbedButton">Close</button>
             </div>
         </div>
     </div>

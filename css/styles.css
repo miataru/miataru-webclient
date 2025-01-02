@@ -305,4 +305,67 @@ body {
 
 .tooltip-style-button.simple:hover {
     background-color: #545b62;
+}
+
+/* Embed Button Style */
+.embed-button {
+    padding: 8px 12px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.embed-button:hover {
+    background-color: #545b62;
+}
+
+/* Code Block Styles */
+.code-block {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 15px 0;
+    position: relative;
+    overflow-x: auto;
+}
+
+.code-block pre {
+    margin: 0;
+    white-space: pre-wrap;
+    font-family: monospace;
+}
+
+.copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.copy-button:hover {
+    background-color: #0056b3;
+}
+
+.embed-example {
+    margin: 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    background-color: #f8f9fa;
+}
+
+.embed-example iframe {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
 } 
