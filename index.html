@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenStreetMap Anwendung</title>
+    <title>Miataru Web Client 2.0</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="css/leaflet.css">
@@ -107,20 +107,20 @@
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
-            <h3>Einstellungen</h3>
+            <h3>Settings</h3>
             <div class="settings-form">
                 <div class="setting-group">
-                    <label for="updateInterval">Update-Intervall (Sekunden):</label>
+                    <label for="updateInterval">Update-Intervall (seconds):</label>
                     <input type="number" id="updateInterval" min="1" max="60" value="5">
                 </div>
                 <div class="setting-group">
-                    <label for="historyAmount">Anzahl der History-Einträge (10-1000):</label>
+                    <label for="historyAmount">Number of history entries to display (10-1000):</label>
                     <input type="number" id="historyAmount" min="10" max="1000" value="100">
                 </div>
             </div>
             <div class="modal-buttons">
-                <button id="saveSettingsButton">Speichern</button>
-                <button id="closeSettingsButton">Abbrechen</button>
+                <button id="saveSettingsButton">Save</button>
+                <button id="closeSettingsButton">Cancel</button>
             </div>
         </div>
     </div>
