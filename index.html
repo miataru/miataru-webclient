@@ -1,325 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="shortcut icon" href="images/favicon.png">
-
-    <title>Miataru Client Application</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="css/bootstrap.css" rel="stylesheet">
-    <!-- LeafletJS core CSS -->
-    <link href="css/leaflet.css" rel="stylesheet">
-    <!-- LeafletJS Locator CSS -->
-    <link href="css/L.Control.Locate.css" rel="stylesheet">
-    <!-- font-awesome CSS -->
-	<link href="css/font-awesome.min.css" rel="stylesheet">
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenStreetMap Anwendung</title>
     
-    <!-- Custom styles for this template -->
-    <link href="index.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Leaflet JavaScript -->
+    <script src="js/leaflet.js"></script>
+</head>
+<body>
+    <div class="toolbar">
+        <a href="https://miataru.com" target="_blank">
+            <img src="img/miataru_icon_29.png" alt="Miataru" class="toolbar-logo">
+        </a>
+        <select id="savedDevices">
+            <option value="">Saved Devices...</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="Miataru DeviceID">
+        <button id="searchButton">Search</button>
+        <button id="helpButton" class="help-button">?</button>
+        <button id="embedButton" class="embed-button">< ></button>
+        <button id="settingsButton" class="settings-button">⚙️</button>
+    </div>
+    <div id="map"></div>
 
-	<script src="js/jquery-1.10.2.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/leaflet.js"></script>
-	<script src="js/L.Control.Locate.js" ></script>
-	<script src="js/L.Control.Button.js"></script>
-	<script src="index.js"></script>
-	
-  </head>
-  
-  <body onLoad="javascript:init();">
-	  <div id="map">
-		  <div class="container">
-		   <div class="row">
-		      <div class="col-md-12">
-		         <nav class="navbar navbar-default" role="navigation">
-		            <!-- Brand and toggle get grouped for better mobile display -->
-		            <div class="navbar-header">
-		               <a class="navbar-brand" href="http://miataru.com">
-			               <img src="images/miataru_icon_29.png">
-		               </a>
-		            </div>
-		            <!-- Collect the nav links, forms, and other content for toggling -->
-		            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-		               <ul class="nav navbar-nav">
-		                  <li><a href="#about" data-toggle="modal" data-target="#about">About</a></li>
-		               </ul>
-		               <ul class="nav navbar-nav">
-		               	  <li class="dropdown">
-		                  	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Known Devices<b class="caret"></b></a>
-		                     <ul id="knowndeviceslist" class="dropdown-menu" style="padding: 15px;min-width: 250px; overflow-y: scroll; max-height:400px;">
-		                     	<!-- here be dragons -->
-		                     </ul>
-		                  </li>
-		               </ul>		               
-		               <ul class="nav navbar-nav">
-		                  <li><a href="#widgetModal" data-toggle="modal" data-target="#widgetModal">Embed</a></li>
-		               </ul>
+    <!-- Modaler Dialog zum Speichern -->
+    <div id="saveDeviceModal" class="modal">
+        <div class="modal-content">
+            <h3>Save Device</h3>
+            <input type="text" id="deviceNameInput" placeholder="Name for this device">
+            <div class="modal-buttons">
+                <button id="saveDeviceButton">Save</button>
+                <button id="cancelSaveButton">Cancel</button>
+            </div>
+        </div>
+    </div>
 
-		               <form class="navbar-form navbar-left" role="search" id="DeviceIDSearch">
-		                  <div class="form-group">
-		                     <div class="input-group custom-search-form">
-				              <input type="text" class="form-control" placeholder="DeviceID">
-				              <span class="input-group-btn">
-				              	<button type="submit" class="btn btn-default">
-				              <span class="glyphicon glyphicon-search"></span>
-				             </button>
-				             </span>
-				             </div><!-- /input-group -->
-		                  </div>
-		               </form>
-		            </div>
-		            <!-- /.navbar-collapse -->
-		         </nav>
-		      </div>
-		   </div>
-		  </div>
-      </div>
-      
-<!-- Modals -->
-<div class="modal fade" id="widgetModal" tabindex="-1" role="dialog" aria-labelledby="widgetModal" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Embed a device into your own website</h4>
-      </div>
-      <div class="modal-body">
-      <span>
-	  You can embed a device into a website by adding the following pattern to your websites HTML:
-	 <pre><code>
-&lt;iframe width="320" scrolling="no" height="240" frameborder="0" src="http://miataru.com/client/embed.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device"&gt;&lt;/iframe&gt;
-	 </code></pre>
-      </span>
-      <span>
-      You have to change the above code snippet to contain the DeviceID (BF01...) and the Device Name (separated after the DeviceID with a ;). You can display multiple devices on one map by separating them further with BF01...;Name;BF02;Name2 and so on...
-      <p>
-      Example:
-      <p>
-      </span>
-      	<div id="embediframeplaceholder"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+    <!-- Modaler Dialog zum Löschen -->
+    <div id="deleteDeviceModal" class="modal">
+        <div class="modal-content">
+            <h3>Delete Device</h3>
+            <p>Do you really want to delete this device?</p>
+            <div class="modal-buttons">
+                <button id="confirmDeleteButton" class="delete-btn">Delete</button>
+                <button id="cancelDeleteButton">Cancel</button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content help-content">
+            <h3>About Miataru Web Client</h3>
+            <div class="help-text">
+                <p>This is a website client for the Miataru service. You can interact with the server side through this website.</p>
+                <p>To save known devices and quickly access them later your browser needs to support HTML5 Web Storage (Web storage is supported in Internet Explorer 8+, Firefox, Opera, Chrome, and Safari.)</p>
+                <p>It is not storing any data except in your local browser - it does access the internet and the Miataru service to retrieve location information for given DeviceIDs.</p>
+                
+                <div class="demo-section">
+                    <p>To see a Demo-Device click here: <a href="#BF0160F5-4138-402C-A5F0-DEB1AA1F4216" class="demo-link">Demo Device</a> or scan the Demo-Device QR Code:</p>
+                    <img src="img/qrcode.png" alt="Demo Device QR Code" class="qr-code">
+                </div>
+                
+                <div class="links-section">
+                    <p>Get more information here: <a href="https://miataru.com" target="_blank">miataru.com</a></p>
+                    <p>Get the sourcecode here: <a href="https://github.com/miataru" target="_blank">github</a></p>
+                </div>
+                
+                <p class="copyright">&copy; 2013-2025 Daniel Kirstenpfad / <a href="https://www.technology-ninja.com/" target="_blank">technology-ninja</a></p>
+            </div>
+            <div class="modal-buttons">
+                <button id="closeHelpButton">Close</button>
+            </div>
+        </div>
+    </div>
 
-<div class="modal fade" id="about" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">About the Miataru Client</h4>
-      </div>
-      <div class="modal-body">
-      <span>
-      This is a website client for the Miataru service. You can interact with the server side through this website. <p>
-      To save known devices and quickly access them later your browser needs to support HTML5 Web Storage (Web storage is supported in Internet Explorer 8+, Firefox, Opera, Chrome, and Safari.)<p>
-      It is not storing any data except in your local browser - it does access the internet and the Miataru service to retrieve location information for given DeviceIDs.
-      <p>
-      To see a Demo-Device click here: <a href="http://miataru.com/client/#BF0160F5-4138-402C-A5F0-DEB1AA1F4216">Demo Device</a> or scan the Demo-Device QR Code:
-    <div align="center"><img src="images/qrcode.png"></div>      
-      Get more information here: <a href="http://miataru.com">miataru.com</a><p>
-      Get the sourcecode here: <a href="http://github.com/miataru">github</a><p>
-      (C) 2013-2014 Daniel Kirstenpfad / <a href="http://www.technology-ninja.com">technology-ninja</a>
-      </span>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-      
-<div class="modal fade" id="editDevice" tabindex="-1" role="dialog" aria-labelledby="editDeviceLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="editDeviceLabel">Edit a Known Device</h4>
-      </div>
-      <div class="modal-body">
-      <div align="center">
-	      <table style="width: 100%;">
-	      	<tr>
-	      		<td>
-	      		Name
-	      		</td>
-	      		<td>
-					<span>
-						<input id="editDevice_DeviceName" type="text" class="form-control">
-					</span>
-	      		</td>
-	      	</tr>
-	      	<tr>
-	      		<td>
-	      		ID
-	      		</td>
-	      		<td>
-		      		<span id="editDevice_DeviceID"></span>
-	      		</td>
-	      	</tr>
-	      </table>
-      </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" data-dismiss="modal" onclick="UpdateDevice()">Save</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+    <!-- Embed Modal -->
+    <div id="embedModal" class="modal">
+        <div class="modal-content help-content">
+            <h3>Embed a device into your own website</h3>
+            <div class="help-text">
+                <p>You can embed a device into a website by adding the following pattern to your website's HTML:</p>
+                
+                <div class="code-block">
+                    <pre><code>&lt;iframe width="320" scrolling="no" height="240" frameborder="0" 
+    src="https://miataru.com/client/index.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device"&gt;&lt;/iframe&gt;</code></pre>
+                    <button class="copy-button" onclick="copyEmbedCode()">Copy</button>
+                </div>
+                
+                <p>Example:</p>
+                <div class="embed-example">
+                    <iframe width="320" scrolling="no" height="240" frameborder="0" 
+                        src="https://miataru.com/client/index.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device"></iframe>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="closeEmbedButton">Close</button>
+            </div>
+        </div>
+    </div>
 
-<div class="modal fade" id="deleteDevice" tabindex="-1" role="dialog" aria-labelledby="deleteDeviceLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="deleteDeviceLabel">Do you really want to remove the device?</h4>
-      </div>
-      <div class="modal-body">
-      <span>
-      Do you really want to delete this device: <p>
-      <div align="center">
-	      <table>
-	      	<tr>
-	      		<td>
-	      		Name
-	      		</td>
-	      		<td>
-		      		<span id="delete_deviceName"></span>
-	      		</td>
-	      	</tr>
-	      	<tr>
-	      		<td>
-	      		ID
-	      		</td>
-	      		<td>
-		      		<span id="delete_deviceID"></span>
-	      		</td>
-	      	</tr>
-	      </table>
-      </div>
-	    	
-      </span>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="DeleteDevice()">Delete</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h3>Einstellungen</h3>
+            <div class="settings-form">
+                <div class="setting-group">
+                    <label for="updateInterval">Update-Intervall (Sekunden):</label>
+                    <input type="number" id="updateInterval" min="1" max="60" value="5">
+                </div>
+                <div class="setting-group">
+                    <label for="historyAmount">Anzahl der History-Einträge (10-1000):</label>
+                    <input type="number" id="historyAmount" min="10" max="1000" value="100">
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="saveSettingsButton">Speichern</button>
+                <button id="closeSettingsButton">Abbrechen</button>
+            </div>
+        </div>
+    </div>
 
-<div class="modal fade" id="doesnotexist" tabindex="-1" role="dialog" aria-labelledby="doesnotexistLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="doesnotexistLabel">Device does not exist.</h4>
-      </div>
-      <div class="modal-body">
-      <span>
-      Unfortunately the Device you wanted to view is not available. It might be timed-out or misspelled.<p>
-      </span>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-
-      
-<script>
-
-// make the search button work
-$(document).ready( function() {
-
-	// this is the iFrame handling for the embedding example. Sine we do not want to display it on page load we fill the div 
-	// when the modal is shown
-	$("#widgetModal").on('show.bs.modal', function(event){
-		console.log("Embed Modal showing");
-		
-		document.getElementById("embediframeplaceholder").innerHTML = '<iframe width="558" scrolling="no" height="240" frameborder="0" src="http://miataru.com/client/embed.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device"></iframe>';
-		
-	  });
-
-	// and clear it when it's hidden
-	$("#widgetModal").on('hide.bs.modal', function(event){
-		console.log("Embed Modal hidden");
-		
-		document.getElementById("embediframeplaceholder").innerHTML = '';
-		
-	  });
-
-    /** Bind onclick event to search button **/
-    $('#DeviceIDSearch').on('submit', function(event){
-        deviceID = $('input', this).val();
-        if(0 == $.trim(deviceID).length) {
-            return;
-        }
-        
-        clearTimeout(markerUpdateTimer);
-        GetLocation(deviceID);
-		event.preventDefault();
-    })
-})
-
-// fill the drop-down with already saved HTML5 local storage known devices...
-
-// load stuff for the first load...
-if (localStorage.KnownDevices != null)
-{
-	KDList = JSON.parse(localStorage.KnownDevices);
-	
-	makeUL('knowndeviceslist',KDList);
-}
-else
-{
-	 var item = document.createElement('li');
-	 item.innerHTML = "no device known yet.";
-	 
-	 document.getElementById('knowndeviceslist').appendChild(item);
-}
-
-
-$(window).load(function(){
-	// look if we got a hash parameter passed
-	if (window.location.hash != "")
-	{
-	    passedDevice = window.location.hash.slice( 1 );
-	    
-	    console.log("User passed a device: "+passedDevice);
-		GetLocation(passedDevice);
-	}
-});
-</script>
-
-<!-- Piwik Tracking Code -->
-<script type="text/javascript">
-  var _paq = _paq || [];
-  _paq.push(["setCookieDomain", "*.miataru.com"]);
-  _paq.push(["trackPageView"]);
-  _paq.push(["enableLinkTracking"]);
-
-  (function() {
-    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://schrankmonster.de/piwik/";
-    _paq.push(["setTrackerUrl", u+"piwik.php"]);
-    _paq.push(["setSiteId", "13"]);
-    var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-    g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- Piwik Tracking Code -->
-
-  </body>
-</html>
+    <script src="js/script.js"></script>
+</body>
+</html> 
