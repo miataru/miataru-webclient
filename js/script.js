@@ -10,6 +10,7 @@ let currentMarker = null;
 let intervalId = null;
 let defaultIntervalId = null;  // Neuer Timer für Default Device
 let currentDeviceToSave = null;
+let deviceToDelete = null;
 
 // Konstanten
 const DEFAULT_DEVICE_ID = 'BF0160F5-4138-402C-A5F0-DEB1AA1F4216';
@@ -68,6 +69,11 @@ function deleteDevice(deviceId) {
     delete devices[deviceId];
     localStorage.setItem(STORED_DEVICES_KEY, JSON.stringify(devices));
     updateDevicesDropdown();
+    
+    // Pin und Popup aktualisieren
+    if (currentMarker) {
+        fetchDeviceLocation(deviceId);
+    }
 }
 
 // Funktion zum Abrufen der Position
@@ -104,7 +110,7 @@ async function fetchDeviceLocation(deviceId) {
                 actionButtons = `
                     <div class="popup-buttons">
                         <button onclick="showSaveDeviceModal('${deviceId}', '${storedName}')" class="rename-btn">Umbenennen</button>
-                        <button onclick="if(confirm('Device wirklich löschen?')) deleteDevice('${deviceId}')" class="delete-btn">×</button>
+                        <button onclick="showDeleteDeviceModal('${deviceId}')" class="delete-btn">×</button>
                     </div>`;
             } else {
                 actionButtons = `
@@ -232,4 +238,43 @@ document.getElementById('searchButton').addEventListener('click', () => {
 });
 
 // Initial die Default-DeviceID laden und tracken
-startTracking(DEFAULT_DEVICE_ID, true); 
+startTracking(DEFAULT_DEVICE_ID, true);
+
+// Funktion zum Anzeigen des Lösch-Dialogs
+function showDeleteDeviceModal(deviceId) {
+    deviceToDelete = deviceId;
+    const modal = document.getElementById('deleteDeviceModal');
+    modal.style.display = 'flex';
+}
+
+// Funktion zum Ausblenden des Lösch-Dialogs
+function hideDeleteDeviceModal() {
+    const modal = document.getElementById('deleteDeviceModal');
+    modal.style.display = 'none';
+    deviceToDelete = null;
+}
+
+// Event-Listener für Lösch-Dialog
+document.getElementById('confirmDeleteButton').addEventListener('click', () => {
+    if (deviceToDelete) {
+        deleteDevice(deviceToDelete);
+        hideDeleteDeviceModal();
+    }
+});
+
+document.getElementById('cancelDeleteButton').addEventListener('click', hideDeleteDeviceModal);
+
+// Klick außerhalb des Lösch-Modals schließt es
+document.getElementById('deleteDeviceModal').addEventListener('click', (e) => {
+    if (e.target.id === 'deleteDeviceModal') {
+        hideDeleteDeviceModal();
+    }
+});
+
+// Escape-Taste schließt auch den Lösch-Dialog
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        hideDeleteDeviceModal();
+        hideSaveDeviceModal();
+    }
+}); 

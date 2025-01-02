@@ -166,4 +166,22 @@ body {
 
 .delete-btn:hover {
     background-color: #c82333;
+}
+
+/* Zusätzliche Styles für den Lösch-Dialog */
+#deleteDeviceModal .modal-content {
+    max-width: 400px;
+}
+
+#deleteDeviceModal p {
+    margin: 0 0 20px 0;
+    color: #666;
+}
+
+#confirmDeleteButton {
+    background-color: #dc3545;
+}
+
+#confirmDeleteButton:hover {
+    background-color: #c82333;
 } 
