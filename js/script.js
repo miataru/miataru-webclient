@@ -13,6 +13,20 @@ let defaultIntervalId = null;  // Neuer Timer für Default Device
 // Konstanten
 const DEFAULT_DEVICE_ID = 'BF0160F5-4138-402C-A5F0-DEB1AA1F4216';
 
+// Benutzerdefiniertes Pin-Icon erstellen
+const pinIcon = L.divIcon({
+    className: 'custom-pin',
+    html: `<svg width="24" height="36" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 0C5.383 0 0 5.383 0 12c0 9 12 24 12 24s12-15 12-24c0-6.617-5.383-12-12-12zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"
+        fill="#007bff" 
+        stroke="#ffffff"
+        stroke-width="1"/>
+    </svg>`,
+    iconSize: [24, 36],
+    iconAnchor: [12, 36],
+    popupAnchor: [0, -36]
+});
+
 // Funktion zum Abrufen der Position
 async function fetchDeviceLocation(deviceId) {
     try {
@@ -21,34 +35,21 @@ async function fetchDeviceLocation(deviceId) {
         
         if (data && data.geometry && data.geometry.coordinates) {
             const coordinates = data.geometry.coordinates;
-            const longitude = coordinates[0];  // 10.891091
-            const latitude = coordinates[1];   // 49.869953
+            const longitude = coordinates[0];
+            const latitude = coordinates[1];
             const name = data.properties?.name || deviceId;
             
-            console.log('Position erhalten:', latitude, longitude); // Debug-Ausgabe
+            console.log('Position erhalten:', latitude, longitude);
             
             // Bestehenden Marker entfernen, falls vorhanden
             if (currentMarker) {
                 map.removeLayer(currentMarker);
             }
             
-            // Neuen Marker mit Icon und Label erstellen
-            const markerIcon = L.divIcon({
-                html: `<div style="
-                    background-color: white;
-                    border: 2px solid #007bff;
-                    border-radius: 3px;
-                    padding: 2px 5px;
-                    font-size: 12px;
-                    white-space: nowrap;
-                ">${name}</div>`,
-                className: 'device-marker',
-                iconAnchor: [15, 0]
-            });
-            
-            // Marker mit Icon setzen und zur Karte hinzufügen
+            // Marker mit benutzerdefiniertem Pin-Icon erstellen
             currentMarker = L.marker([latitude, longitude], {
-                icon: markerIcon
+                icon: pinIcon,
+                title: name  // Zeigt Namen beim Hover über den Pin
             });
             currentMarker.addTo(map);
             
@@ -64,9 +65,9 @@ async function fetchDeviceLocation(deviceId) {
                 duration: 1.5
             });
             
-            console.log('Marker gesetzt und Karte zentriert'); // Debug-Ausgabe
+            console.log('Marker gesetzt und Karte zentriert');
         } else {
-            console.log('Keine gültigen Daten in der GeoJSON-Antwort'); // Debug-Ausgabe
+            console.log('Keine gültigen Daten in der GeoJSON-Antwort');
         }
     } catch (error) {
         console.error('Fehler beim Abrufen der Position:', error);
