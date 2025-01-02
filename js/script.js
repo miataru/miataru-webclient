@@ -28,6 +28,9 @@ const TOOLTIP_STYLE = {
     FULL: 'full'
 };
 
+// Globale Variable für den Genauigkeitskreis
+let accuracyCircle = null;
+
 // Funktion zum Laden der gespeicherten Devices
 function loadStoredDevices() {
     const stored = localStorage.getItem(STORED_DEVICES_KEY);
@@ -266,14 +269,29 @@ async function fetchDeviceLocation(deviceId) {
             currentDeviceName = storedName;
             currentLocation = location;
             
+            const latitude = parseFloat(location.Latitude);
+            const longitude = parseFloat(location.Longitude);
+            const accuracy = parseFloat(location.HorizontalAccuracy);
+            
+            // Bestehenden Marker und Kreis entfernen
             if (currentMarker) {
                 map.removeLayer(currentMarker);
             }
+            if (accuracyCircle) {
+                map.removeLayer(accuracyCircle);
+            }
             
-            currentMarker = L.marker([
-                parseFloat(location.Latitude),
-                parseFloat(location.Longitude)
-            ], {
+            // Genauigkeitskreis hinzufügen
+            accuracyCircle = L.circle([latitude, longitude], {
+                radius: accuracy,
+                color: '#007bff',
+                fillColor: '#007bff',
+                fillOpacity: 0.1,
+                weight: 1
+            }).addTo(map);
+            
+            // Marker erstellen und hinzufügen
+            currentMarker = L.marker([latitude, longitude], {
                 icon: pinIcon,
                 title: storedName || deviceId
             });
@@ -285,7 +303,15 @@ async function fetchDeviceLocation(deviceId) {
             
             if (autoCenterEnabled) {
                 currentMarker.openPopup();
-                map.flyTo([parseFloat(location.Latitude), parseFloat(location.Longitude)], 13, {
+                // Zoom-Level basierend auf Genauigkeit anpassen
+                const zoomLevel = Math.min(
+                    18, // maximales Zoom-Level
+                    Math.max(
+                        13, // minimales Zoom-Level
+                        19 - Math.log2(accuracy / 10) // Zoom basierend auf Genauigkeit
+                    )
+                );
+                map.flyTo([latitude, longitude], zoomLevel, {
                     duration: 1.5
                 });
             }
