@@ -46,4 +46,14 @@ body {
 
 .custom-pin svg {
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3));
+}
+
+@media screen and (max-width: 640px) {
+    .toolbar {
+        display: none;
+    }
+    
+    #map {
+        height: 100vh;
+    }
 } 
