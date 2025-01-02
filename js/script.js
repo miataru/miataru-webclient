@@ -9,6 +9,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 let currentMarker = null;
 let intervalId = null;
 let defaultIntervalId = null;  // Neuer Timer für Default Device
+let currentDeviceToSave = null;
 
 // Konstanten
 const DEFAULT_DEVICE_ID = 'BF0160F5-4138-402C-A5F0-DEB1AA1F4216';
@@ -89,7 +90,7 @@ async function fetchDeviceLocation(deviceId) {
                 <strong>DeviceID:</strong> ${name}<br>
                 <strong>Koordinaten:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}<br>
                 <strong>Letzte Aktualisierung:</strong> ${new Date().toLocaleTimeString()}<br>
-                <button onclick="saveCurrentDevice('${deviceId}')" class="save-device-btn">Device speichern</button>
+                <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Device speichern</button>
             `;
             
             currentMarker.bindPopup(popupContent).openPopup();
@@ -103,13 +104,46 @@ async function fetchDeviceLocation(deviceId) {
     }
 }
 
-// Funktion zum Speichern des aktuellen Devices
-window.saveCurrentDevice = function(deviceId) {
-    const name = prompt('Unter welchem Namen soll das Device gespeichert werden?');
-    if (name) {
-        saveDevice(deviceId, name);
+// Modal-Funktionen
+function showSaveDeviceModal(deviceId) {
+    currentDeviceToSave = deviceId;
+    const modal = document.getElementById('saveDeviceModal');
+    const input = document.getElementById('deviceNameInput');
+    modal.style.display = 'flex';
+    input.value = '';
+    input.focus();
+}
+
+function hideSaveDeviceModal() {
+    const modal = document.getElementById('saveDeviceModal');
+    modal.style.display = 'none';
+    currentDeviceToSave = null;
+}
+
+// Event-Listener für Modal-Buttons
+document.getElementById('saveDeviceButton').addEventListener('click', () => {
+    const name = document.getElementById('deviceNameInput').value.trim();
+    if (name && currentDeviceToSave) {
+        saveDevice(currentDeviceToSave, name);
+        hideSaveDeviceModal();
     }
-};
+});
+
+document.getElementById('cancelSaveButton').addEventListener('click', hideSaveDeviceModal);
+
+// Schließen mit Escape-Taste
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        hideSaveDeviceModal();
+    }
+});
+
+// Klick außerhalb des Modals schließt es
+document.getElementById('saveDeviceModal').addEventListener('click', (e) => {
+    if (e.target.id === 'saveDeviceModal') {
+        hideSaveDeviceModal();
+    }
+});
 
 // Event-Listener für das Dropdown
 document.getElementById('savedDevices').addEventListener('change', (e) => {
