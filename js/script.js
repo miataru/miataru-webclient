@@ -79,14 +79,28 @@ function deleteDevice(deviceId) {
 // Funktion zum Abrufen der Position
 async function fetchDeviceLocation(deviceId) {
     try {
-        const response = await fetch(`https://service.miataru.com/v1/GetLocationGeoJSON/${deviceId}`);
+        // POST Request mit Device ID
+        const response = await fetch('https://service.miataru.com/v1/GetLocation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "MiataruGetLocation": [
+                    {
+                        "Device": deviceId
+                    }
+                ]
+            })
+        });
+        
         const data = await response.json();
         
-        if (data && data.geometry && data.geometry.coordinates) {
-            const coordinates = data.geometry.coordinates;
-            const longitude = coordinates[0];
-            const latitude = coordinates[1];
-            const name = data.properties?.name || deviceId;
+        if (data && data.MiataruLocation && data.MiataruLocation[0]) {
+            const location = data.MiataruLocation[0];
+            const longitude = parseFloat(location.Longitude);
+            const latitude = parseFloat(location.Latitude);
+            const timestamp = new Date(parseFloat(location.Timestamp) * 1000);
             
             // Gespeicherten Namen abrufen, falls vorhanden
             const storedDevices = loadStoredDevices();
@@ -121,7 +135,8 @@ async function fetchDeviceLocation(deviceId) {
             const popupContent = `
                 <strong>DeviceID:</strong> ${displayName}<br>
                 <strong>Koordinaten:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}<br>
-                <strong>Letzte Aktualisierung:</strong> ${new Date().toLocaleTimeString()}<br>
+                <strong>Genauigkeit:</strong> ${parseFloat(location.HorizontalAccuracy).toFixed(1)}m<br>
+                <strong>Letzte Aktualisierung:</strong> ${timestamp.toLocaleString()}<br>
                 ${actionButtons}
             `;
             
