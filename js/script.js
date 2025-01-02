@@ -37,6 +37,9 @@ let accuracyCircle = null;
 // Globale Variable für den History-Status
 let historyModeActive = false;
 
+// Globale Variable für die aktuelle DeviceHistory-Instanz
+let currentDeviceHistory = null;
+
 // Funktion zum Laden der gespeicherten Devices
 function loadStoredDevices() {
     const stored = localStorage.getItem(STORED_DEVICES_KEY);
@@ -231,7 +234,7 @@ function addTooltipStyleControl() {
 // Funktion zum Erstellen des Popup-Inhalts
 function createPopupContent(deviceId, storedName, location) {
     const displayName = storedName ? `${storedName} (${deviceId})` : deviceId;
-    const simpleName = storedName || deviceId;  // Nur Name oder ID für Simple-Modus
+    const simpleName = storedName || deviceId;
     const timestamp = new Date(parseFloat(location.Timestamp) * 1000);
     
     // Buttons basierend auf Speicherstatus
@@ -241,13 +244,13 @@ function createPopupContent(deviceId, storedName, location) {
             <div class="popup-buttons">
                 <button onclick="showSaveDeviceModal('${deviceId}', '${storedName}')" class="rename-btn">Rename</button>
                 <button onclick="showDeleteDeviceModal('${deviceId}')" class="delete-btn">×</button>
-                <button class="history-device">History</button>
+                <button onclick="toggleHistory('${deviceId}', this)" class="history-device">History</button>
             </div>`;
     } else {
         actionButtons = `
             <div class="popup-buttons">
                 <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Save Device</button>
-                <button class="history-device">History</button>
+                <button onclick="toggleHistory('${deviceId}', this)" class="history-device">History</button>
             </div>`;
     }
     
@@ -300,6 +303,36 @@ function updateRelativeTime() {
         if (currentMarker.isPopupOpen()) {
             currentMarker.openPopup();
         }
+    }
+}
+
+// Neue globale Funktion für History Toggle
+async function toggleHistory(deviceId, button) {
+    if (!currentDeviceHistory) {
+        currentDeviceHistory = new DeviceHistory(deviceId, map);
+    }
+
+    if (!historyModeActive) {
+        // History aktivieren
+        historyModeActive = true;
+        if (intervalId) clearInterval(intervalId);
+        if (defaultIntervalId) clearInterval(defaultIntervalId);
+        
+        await currentDeviceHistory.loadHistory();
+        currentDeviceHistory.isTracking = true;
+        button.textContent = 'Hide History';
+    } else {
+        // History deaktivieren
+        historyModeActive = false;
+        if (currentDeviceHistory) {
+            currentDeviceHistory.clearHistory();
+            currentDeviceHistory.isTracking = false;
+        }
+        currentDeviceHistory = null;
+        button.textContent = 'History';
+        
+        // Tracking neu starten
+        startTracking(deviceId, false);
     }
 }
 
@@ -374,24 +407,7 @@ async function fetchDeviceLocation(deviceId) {
             const popupContent = createPopupContent(deviceId, storedName, location);
             currentMarker.bindPopup(popupContent);
             
-            // Hier fügen wir die Device-Controls hinzu
-            const popup = currentMarker.getPopup();
-            popup.on('add', () => {
-                const container = popup.getElement();
-                if (container) {
-                    // Device-Controls initialisieren
-                    const deviceObj = {
-                        id: deviceId,
-                        stopTracking: () => {
-                            if (intervalId) clearInterval(intervalId);
-                        },
-                        startTracking: () => {
-                            startTracking(deviceId, false);
-                        }
-                    };
-                    initializeDeviceControls(deviceObj, container);
-                }
-            });
+            // Popup Event-Handler entfernen, da wir jetzt onclick im Button verwenden
             
             if (autoCenterEnabled) {
                 currentMarker.openPopup();
@@ -762,32 +778,4 @@ class DeviceHistory {
         this.historyMarkers.forEach(marker => marker.remove());
         this.historyMarkers = [];
     }
-}
-
-// Die initializeDeviceControls Funktion anpassen
-function initializeDeviceControls(device, container) {
-    const historyButton = container.querySelector('.history-device');
-    if (!historyButton) return;
-    
-    const deviceHistory = new DeviceHistory(device.id, map);
-    
-    historyButton.addEventListener('click', async () => {
-        if (!deviceHistory.isTracking) {
-            historyModeActive = true;
-            if (intervalId) clearInterval(intervalId);
-            if (defaultIntervalId) clearInterval(defaultIntervalId);
-            
-            await deviceHistory.loadHistory();
-            deviceHistory.isTracking = true;
-            historyButton.textContent = 'Hide History';
-        } else {
-            historyModeActive = false;
-            deviceHistory.clearHistory();
-            deviceHistory.isTracking = false;
-            historyButton.textContent = 'History';
-            
-            // Tracking neu starten
-            startTracking(device.id, false);
-        }
-    });
 } 
