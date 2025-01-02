@@ -238,11 +238,24 @@ document.getElementById('savedDevices').addEventListener('change', (e) => {
 // Initial die gespeicherten Devices laden
 updateDevicesDropdown();
 
-// Funktion zum Starten der Aktualisierung
+// Funktion zum Setzen der DeviceID in der URL
+function setDeviceIdInUrl(deviceId) {
+    window.location.hash = deviceId;
+}
+
+// Funktion zum Lesen der DeviceID aus der URL
+function getDeviceIdFromUrl() {
+    return window.location.hash.slice(1) || DEFAULT_DEVICE_ID;
+}
+
+// Funktion zum Starten der Aktualisierung anpassen
 function startTracking(deviceId, isDefault = false) {
     // Bestehende Timer stoppen
     if (intervalId) clearInterval(intervalId);
     if (defaultIntervalId) clearInterval(defaultIntervalId);
+    
+    // DeviceID in URL setzen
+    setDeviceIdInUrl(deviceId);
     
     // Sofort erste Abfrage durchführen
     fetchDeviceLocation(deviceId);
@@ -260,6 +273,20 @@ function startTracking(deviceId, isDefault = false) {
     }
 }
 
+// Event-Listener für URL-Änderungen
+window.addEventListener('hashchange', () => {
+    const deviceId = getDeviceIdFromUrl();
+    document.getElementById('searchInput').value = deviceId;
+    startTracking(deviceId, deviceId === DEFAULT_DEVICE_ID);
+});
+
+// Initialisierung anpassen - URL-Parameter berücksichtigen
+const initialDeviceId = getDeviceIdFromUrl();
+if (initialDeviceId !== DEFAULT_DEVICE_ID) {
+    document.getElementById('searchInput').value = initialDeviceId;
+}
+startTracking(initialDeviceId, initialDeviceId === DEFAULT_DEVICE_ID);
+
 // Event-Listener für den Such-Button
 document.getElementById('searchButton').addEventListener('click', () => {
     const inputDeviceId = document.getElementById('searchInput').value.trim();
@@ -272,9 +299,6 @@ document.getElementById('searchButton').addEventListener('click', () => {
         startTracking(DEFAULT_DEVICE_ID, true);
     }
 });
-
-// Initial die Default-DeviceID laden und tracken
-startTracking(DEFAULT_DEVICE_ID, true);
 
 // Funktion zum Anzeigen des Lösch-Dialogs
 function showDeleteDeviceModal(deviceId) {
