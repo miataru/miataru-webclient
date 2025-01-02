@@ -62,6 +62,14 @@ const pinIcon = L.divIcon({
     popupAnchor: [0, -36]
 });
 
+// Funktion zum Löschen eines Devices
+function deleteDevice(deviceId) {
+    const devices = loadStoredDevices();
+    delete devices[deviceId];
+    localStorage.setItem(STORED_DEVICES_KEY, JSON.stringify(devices));
+    updateDevicesDropdown();
+}
+
 // Funktion zum Abrufen der Position
 async function fetchDeviceLocation(deviceId) {
     try {
@@ -86,16 +94,29 @@ async function fetchDeviceLocation(deviceId) {
             // Marker mit erweitertem Popup erstellen
             currentMarker = L.marker([latitude, longitude], {
                 icon: pinIcon,
-                title: displayName  // Zeigt gespeicherten Namen + DeviceID im Tooltip
+                title: displayName
             });
             currentMarker.addTo(map);
             
-            // Erweitertes Popup mit Speichern-Button
+            // Buttons basierend auf Speicherstatus
+            let actionButtons;
+            if (storedName) {
+                actionButtons = `
+                    <div class="popup-buttons">
+                        <button onclick="showSaveDeviceModal('${deviceId}', '${storedName}')" class="rename-btn">Umbenennen</button>
+                        <button onclick="if(confirm('Device wirklich löschen?')) deleteDevice('${deviceId}')" class="delete-btn">×</button>
+                    </div>`;
+            } else {
+                actionButtons = `
+                    <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Device speichern</button>`;
+            }
+            
+            // Erweitertes Popup mit dynamischen Buttons
             const popupContent = `
                 <strong>DeviceID:</strong> ${displayName}<br>
                 <strong>Koordinaten:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}<br>
                 <strong>Letzte Aktualisierung:</strong> ${new Date().toLocaleTimeString()}<br>
-                <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Device speichern</button>
+                ${actionButtons}
             `;
             
             currentMarker.bindPopup(popupContent).openPopup();
@@ -109,13 +130,26 @@ async function fetchDeviceLocation(deviceId) {
     }
 }
 
-// Modal-Funktionen
-function showSaveDeviceModal(deviceId) {
+// Modal-Funktionen anpassen
+function showSaveDeviceModal(deviceId, existingName = '') {
     currentDeviceToSave = deviceId;
     const modal = document.getElementById('saveDeviceModal');
     const input = document.getElementById('deviceNameInput');
+    const title = document.querySelector('#saveDeviceModal h3');
+    const saveButton = document.getElementById('saveDeviceButton');
+    
+    // UI an Aktion anpassen
+    if (existingName) {
+        title.textContent = 'Device umbenennen';
+        saveButton.textContent = 'Umbenennen';
+        input.value = existingName;
+    } else {
+        title.textContent = 'Device speichern';
+        saveButton.textContent = 'Speichern';
+        input.value = '';
+    }
+    
     modal.style.display = 'flex';
-    input.value = '';
     input.focus();
 }
 

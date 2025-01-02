@@ -131,4 +131,39 @@ body {
 
 #cancelSaveButton:hover {
     background-color: #545b62;
+}
+
+/* Popup Button Styles */
+.popup-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.rename-btn, .save-device-btn {
+    padding: 4px 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.rename-btn:hover, .save-device-btn:hover {
+    background-color: #0056b3;
+}
+
+.delete-btn {
+    padding: 4px 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.delete-btn:hover {
+    background-color: #c82333;
 } 
