@@ -15,6 +15,9 @@ let deviceToDelete = null;
 // Neue globale Variable für den Auto-Center Status
 let autoCenterEnabled = true;
 
+// Neue globale Variable für manuellen Zoom-Status
+let userHasZoomed = false;
+
 // Konstanten
 const DEFAULT_DEVICE_ID = 'BF0160F5-4138-402C-A5F0-DEB1AA1F4216';
 
@@ -240,6 +243,13 @@ let currentDeviceId = null;
 let currentDeviceName = null;
 let currentLocation = null;
 
+// Event-Listener für Zoom-Änderungen
+map.on('zoomend', (e) => {
+    if (!e.target._animatingZoom) { // Nur bei manuellem Zoom
+        userHasZoomed = true;
+    }
+});
+
 // Funktion zum Abrufen der Position anpassen
 async function fetchDeviceLocation(deviceId) {
     try {
@@ -303,17 +313,26 @@ async function fetchDeviceLocation(deviceId) {
             
             if (autoCenterEnabled) {
                 currentMarker.openPopup();
-                // Zoom-Level basierend auf Genauigkeit anpassen
-                const zoomLevel = Math.min(
-                    18, // maximales Zoom-Level
-                    Math.max(
-                        13, // minimales Zoom-Level
-                        19 - Math.log2(accuracy / 10) // Zoom basierend auf Genauigkeit
-                    )
-                );
-                map.flyTo([latitude, longitude], zoomLevel, {
-                    duration: 1.5
-                });
+                
+                // Nur Zoom anpassen wenn der Nutzer noch nicht manuell gezoomt hat
+                const targetPos = [latitude, longitude];
+                if (!userHasZoomed) {
+                    const zoomLevel = Math.min(
+                        18, // maximales Zoom-Level
+                        Math.max(
+                            13, // minimales Zoom-Level
+                            19 - Math.log2(accuracy / 10) // Zoom basierend auf Genauigkeit
+                        )
+                    );
+                    map.flyTo(targetPos, zoomLevel, {
+                        duration: 1.5
+                    });
+                } else {
+                    // Nur Position ändern, Zoom-Level beibehalten
+                    map.panTo(targetPos, {
+                        duration: 1.5
+                    });
+                }
             }
         }
     } catch (error) {
@@ -405,6 +424,9 @@ function startTracking(deviceId, isDefault = false) {
     
     // DeviceID in URL setzen
     setDeviceIdInUrl(deviceId);
+    
+    // Bei neuem Device den Zoom-Status zurücksetzen
+    userHasZoomed = false;
     
     // Sofort erste Abfrage durchführen
     fetchDeviceLocation(deviceId);
