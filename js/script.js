@@ -87,13 +87,13 @@ function getRelativeTimeString(timestamp) {
     const days = Math.floor(hours / 24);
     
     if (days > 0) {
-        return `vor ${days} ${days === 1 ? 'Tag' : 'Tagen'}`;
+        return `${days} ${days === 1 ? 'day' : 'days'} ago`;
     } else if (hours > 0) {
-        return `vor ${hours} ${hours === 1 ? 'Stunde' : 'Stunden'}`;
+        return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
     } else if (minutes > 0) {
-        return `vor ${minutes} ${minutes === 1 ? 'Minute' : 'Minuten'}`;
+        return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
     } else {
-        return `vor ${seconds} ${seconds === 1 ? 'Sekunde' : 'Sekunden'}`;
+        return `${seconds} ${seconds === 1 ? 'second' : 'seconds'} ago`;
     }
 }
 
@@ -144,20 +144,20 @@ async function fetchDeviceLocation(deviceId) {
             if (storedName) {
                 actionButtons = `
                     <div class="popup-buttons">
-                        <button onclick="showSaveDeviceModal('${deviceId}', '${storedName}')" class="rename-btn">Umbenennen</button>
+                        <button onclick="showSaveDeviceModal('${deviceId}', '${storedName}')" class="rename-btn">Rename</button>
                         <button onclick="showDeleteDeviceModal('${deviceId}')" class="delete-btn">×</button>
                     </div>`;
             } else {
                 actionButtons = `
-                    <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Device speichern</button>`;
+                    <button onclick="showSaveDeviceModal('${deviceId}')" class="save-device-btn">Save Device</button>`;
             }
             
             // Erweitertes Popup mit dynamischen Buttons
             const popupContent = `
                 <strong>DeviceID:</strong> ${displayName}<br>
-                <strong>Koordinaten:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}<br>
-                <strong>Genauigkeit:</strong> ${parseFloat(location.HorizontalAccuracy).toFixed(1)}m<br>
-                <strong>Letzte Aktualisierung:</strong> ${getRelativeTimeString(timestamp)} (${timestamp.toLocaleString()})<br>
+                <strong>Coordinates:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}<br>
+                <strong>Accuracy:</strong> ${parseFloat(location.HorizontalAccuracy).toFixed(1)}m<br>
+                <strong>Last Update:</strong> ${getRelativeTimeString(timestamp)} (${timestamp.toLocaleString()})<br>
                 ${actionButtons}
             `;
             
@@ -182,12 +182,12 @@ function showSaveDeviceModal(deviceId, existingName = '') {
     
     // UI an Aktion anpassen
     if (existingName) {
-        title.textContent = 'Device umbenennen';
-        saveButton.textContent = 'Umbenennen';
+        title.textContent = 'Rename Device';
+        saveButton.textContent = 'Rename';
         input.value = existingName;
     } else {
-        title.textContent = 'Device speichern';
-        saveButton.textContent = 'Speichern';
+        title.textContent = 'Save Device';
+        saveButton.textContent = 'Save';
         input.value = '';
     }
     
