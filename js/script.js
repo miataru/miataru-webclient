@@ -264,10 +264,23 @@ function createPopupContent(deviceId, storedName, location) {
             ${getRelativeTimeString(timestamp)}
         `;
     } else {
+        let additionalInfo = '';
+        
+        // Add BatteryLevel if available
+        if (location.BatteryLevel !== undefined && location.BatteryLevel !== null) {
+            additionalInfo += `<strong>Battery Level:</strong> ${location.BatteryLevel}%<br>`;
+        }
+        
+        // Add Altitude if available
+        if (location.Altitude !== undefined && location.Altitude !== null) {
+            additionalInfo += `<strong>Altitude:</strong> ${parseFloat(location.Altitude).toFixed(1)}m<br>`;
+        }
+        
         return `
             <strong>DeviceID:</strong> ${displayName}<br>
             <strong>Coordinates:</strong> ${parseFloat(location.Latitude).toFixed(6)}, ${parseFloat(location.Longitude).toFixed(6)}<br>
             <strong>Accuracy:</strong> ${parseFloat(location.HorizontalAccuracy).toFixed(1)}m<br>
+            ${additionalInfo}
             <strong>Last Update:</strong> ${getRelativeTimeString(timestamp)} (${timestamp.toLocaleString()})<br>
             ${actionButtons}
         `;
@@ -292,7 +305,9 @@ function hasLocationChanged(oldLocation, newLocation) {
     
     return oldLocation.Latitude !== newLocation.Latitude ||
            oldLocation.Longitude !== newLocation.Longitude ||
-           oldLocation.HorizontalAccuracy !== newLocation.HorizontalAccuracy;
+           oldLocation.HorizontalAccuracy !== newLocation.HorizontalAccuracy ||
+           oldLocation.BatteryLevel !== newLocation.BatteryLevel ||
+           oldLocation.Altitude !== newLocation.Altitude;
 }
 
 // Funktion zum Aktualisieren der relativen Zeit im Popup
