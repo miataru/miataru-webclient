@@ -685,7 +685,7 @@ function showEmbedModal() {
     iframe.height = '240';
     iframe.scrolling = 'no';
     iframe.frameBorder = '0';
-    iframe.src = 'https://miataru.com/client/index.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device';
+    iframe.src = 'https://www.miataru.com/client/#BF0160F5-4138-402C-A5F0-DEB1AA1F4216';
     
     // Bestehenden iframe entfernen falls vorhanden
     iframeContainer.innerHTML = '';
