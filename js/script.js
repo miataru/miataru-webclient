@@ -662,11 +662,30 @@ document.querySelector('.demo-link')?.addEventListener('click', (e) => {
 // Embed Modal Funktionen
 function showEmbedModal() {
     const modal = document.getElementById('embedModal');
+    const iframeContainer = document.getElementById('embedIframeContainer');
+    
+    // iframe dynamisch erstellen und hinzufügen
+    const iframe = document.createElement('iframe');
+    iframe.width = '320';
+    iframe.height = '240';
+    iframe.scrolling = 'no';
+    iframe.frameBorder = '0';
+    iframe.src = 'https://miataru.com/client/index.html#BF0160F5-4138-402C-A5F0-DEB1AA1F4216;Demo Device';
+    
+    // Bestehenden iframe entfernen falls vorhanden
+    iframeContainer.innerHTML = '';
+    iframeContainer.appendChild(iframe);
+    
     modal.style.display = 'flex';
 }
 
 function hideEmbedModal() {
     const modal = document.getElementById('embedModal');
+    const iframeContainer = document.getElementById('embedIframeContainer');
+    
+    // iframe entfernen um Ressourcen zu sparen
+    iframeContainer.innerHTML = '';
+    
     modal.style.display = 'none';
 }
 
